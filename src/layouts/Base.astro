@@ -1,0 +1,27 @@
+---
+
+---
+
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+        <meta name="generator" content={Astro.generator} />
+        <link rel="icon" type="image/svg+xml" href="/Portfolio/favicon.svg" />
+        <title>Portfolio</title>
+    </head>
+    <body>
+        <slot />
+    </body>
+</html>
+
+<script>
+    // Setup GSAP plugins
+    import { gsap } from "gsap";
+    import { Observer } from "gsap/Observer";
+    import { MotionPathPlugin } from "gsap/MotionPathPlugin";
+    import { TextPlugin } from "gsap/TextPlugin";
+    import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+    gsap.registerPlugin(Observer, MotionPathPlugin, TextPlugin, ScrollTrigger);
+</script>
