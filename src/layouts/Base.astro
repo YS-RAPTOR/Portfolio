@@ -1,7 +1,3 @@
----
-
----
-
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
@@ -10,7 +6,7 @@
         <link rel="icon" type="image/svg+xml" href="/Portfolio/favicon.svg" />
         <title>Portfolio</title>
     </head>
-    <body>
+    <body class="bg-zinc-950 font-mono text-zinc-50">
         <slot />
     </body>
 </html>
@@ -18,10 +14,10 @@
 <script>
     // Setup GSAP plugins
     import { gsap } from "gsap";
-    import { Observer } from "gsap/Observer";
     import { MotionPathPlugin } from "gsap/MotionPathPlugin";
     import { TextPlugin } from "gsap/TextPlugin";
     import { ScrollTrigger } from "gsap/ScrollTrigger";
+    import { useGSAP } from "@gsap/react";
 
-    gsap.registerPlugin(Observer, MotionPathPlugin, TextPlugin, ScrollTrigger);
+    gsap.registerPlugin(MotionPathPlugin, TextPlugin, ScrollTrigger, useGSAP);
 </script>

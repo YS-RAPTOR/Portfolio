@@ -1,7 +1,50 @@
 ---
 import Base from "../layouts/Base.astro";
+import { Logo } from "../components/Logo.tsx";
+import { HeroBackground } from "../components/HeroBackground.tsx";
+import { Rewrite } from "../components/Rewrite.tsx";
 ---
 
 <Base>
-    <h1>Hello</h1>
+    <header class="flex w-full items-center justify-center border-b">
+        <nav class="relative flex h-20 w-full justify-end border-x md:w-2/3">
+            <div
+                class="absolute bottom-0 left-0 z-30 flex aspect-square h-20 w-20 translate-y-full items-center justify-center rounded-full border-2 bg-zinc-950 p-5 md:-translate-x-1/2 md:translate-y-1/2"
+            >
+                <Logo client:load />
+            </div>
+
+            <div class="flex min-w-fit">
+                <a
+                    href="/Portfolio/resume"
+                    class="flex h-full min-w-fit items-center justify-center border-x px-3 text-center text-base font-black duration-200 hover:bg-zinc-700 xs:px-5 xs:text-lg"
+                >
+                    Resume
+                </a>
+                <a
+                    href="#Contact"
+                    class="flex min-w-fit items-center justify-center rounded-[4rem] bg-teal-500 px-8 text-center text-base font-black text-zinc-950 transition-[border-radius] duration-200 ease-in-out hover:rounded-none xs:text-lg"
+                >
+                    Contact Me
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main id="Hero" class="flex h-fit justify-center border-b">
+        <div class="flex h-fit w-full justify-end border-x md:w-2/3">
+            <HeroBackground client:load />
+        </div>
+    </main>
+    <section id="Projects">
+        <h1>Projects</h1>
+    </section>
+    <section id="About">
+        <h1>About Me</h1>
+    </section>
+    <section id="Contact">
+        <h1>Reach out to me</h1>
+    </section>
 </Base>
+
+<script></script>
