@@ -8,8 +8,8 @@ const GOL_CONSTANTS = {
     InnerHoverSize: 15,
     InnerHoverSizeMain: 30,
     timing: (1 / 60) * 1000,
-    hoverRadius: 2,
-    pressedHoverRadius: 56,
+    hoverRadius: 100,
+    pressedHoverRadius: 125,
     hoverChance: 0.15,
     backgroundColor: "9, 9, 11",
     Colors: [
@@ -280,11 +280,6 @@ class GOL {
         this.canvas.width = numberHorizontally * GOL_CONSTANTS.SquareSize;
         this.canvas.height = numberVertically * GOL_CONSTANTS.SquareSize;
 
-        if (!init) {
-            if (this.initAnimationDone) this.refreshGsap();
-            this.renderer.setSize(this.canvas.width, this.canvas.height);
-        }
-
         this.squareSizesArray = new Float32Array(
             this.numberHorizontally * this.numberVertically,
         );
@@ -299,6 +294,13 @@ class GOL {
             THREE.FloatType,
         );
 
+        if (!init) {
+            this.renderer.setSize(this.canvas.width, this.canvas.height);
+            this.drawMaterial.uniforms.uSquareSizes!.value =
+                this.squareSizesTexture;
+
+            if (this.initAnimationDone) this.refreshGsap();
+        }
         this.resizeCommand.yes = false;
     };
 
@@ -322,6 +324,7 @@ class GOL {
         this.pointer.x = Math.floor(x);
         this.pointer.y = Math.floor(y);
         this.pointer.pressDown = pressDown;
+        this.pointer.isOver = true;
     };
 
     updatePointerOver = (isOver: boolean) => {
@@ -334,30 +337,47 @@ class GOL {
         }
 
         let indices: number[] = [];
-        const mainX = Math.floor(this.pointer.x / GOL_CONSTANTS.SquareSize);
+        const mainX = Math.trunc(
+            (this.pointer.x - 0.1) / GOL_CONSTANTS.SquareSize,
+        );
         const mainY =
             this.numberVertically -
-            Math.floor(this.pointer.y / GOL_CONSTANTS.SquareSize) -
+            Math.trunc((this.pointer.y - 0.1) / GOL_CONSTANTS.SquareSize) -
             1;
+
         const mainIndex = mainX + mainY * this.numberHorizontally;
 
-        const n = Math.floor(
-            GOL_CONSTANTS.hoverRadius / GOL_CONSTANTS.SquareSize,
-        );
+        const radius = this.pointer.pressDown
+            ? GOL_CONSTANTS.pressedHoverRadius
+            : GOL_CONSTANTS.hoverRadius;
+        const n = Math.floor(radius / GOL_CONSTANTS.SquareSize);
 
         for (let i = -n + mainX; i <= n + mainX; i++) {
+            const ii =
+                ((i % this.numberHorizontally) + this.numberHorizontally) %
+                this.numberHorizontally;
             const x =
                 i * GOL_CONSTANTS.SquareSize + GOL_CONSTANTS.SquareSize / 2;
-            const dx = mainX - x;
+            const dx =
+                mainX * GOL_CONSTANTS.SquareSize +
+                GOL_CONSTANTS.SquareSize / 2 -
+                x;
             const dx2 = dx * dx;
 
             for (let j = -n + mainY; j <= n + mainY; j++) {
+                const jj =
+                    ((j % this.numberVertically) + this.numberVertically) %
+                    this.numberVertically;
                 const y =
                     j * GOL_CONSTANTS.SquareSize + GOL_CONSTANTS.SquareSize / 2;
-                const dy = mainY - y;
 
-                if (Math.sqrt(dx2 + dy) <= GOL_CONSTANTS.hoverRadius) {
-                    indices.push(i + j * this.numberHorizontally);
+                const dy =
+                    mainY * GOL_CONSTANTS.SquareSize +
+                    GOL_CONSTANTS.SquareSize / 2 -
+                    y;
+
+                if (Math.sqrt(dx2 + dy * dy) <= radius) {
+                    indices.push(ii + jj * this.numberHorizontally);
                 }
             }
         }
@@ -382,7 +402,6 @@ class GOL {
         // Check for hover
         const [mainIndex, hoverIndices] = this.getHoverIndices();
         if (this.initAnimationDone) {
-            // console.log(this.squareGsapHandlers);
             // TODO: Update hover region
 
             for (let i = 0; i < this.squareSizes.length; i++) {
@@ -422,10 +441,6 @@ class GOL {
 
         for (let i = 0; i < this.squareSizes.length; i++) {
             this.squareSizesArray[i] = this.squareSizes[i].size;
-
-            if (i === mainIndex) {
-                console.log(mainIndex, this.squareSizes[i].size);
-            }
         }
 
         this.squareSizesTexture.needsUpdate = true;
@@ -456,6 +471,14 @@ export const HeroBackground = () => {
             gol.updatePointerMove(e.offsetX, e.offsetY, e.buttons > 0);
         };
 
+        const pointerDown = (e: PointerEvent) => {
+            gol.updatePointerMove(e.offsetX, e.offsetY, true);
+        };
+
+        const pointerUp = (e: PointerEvent) => {
+            gol.updatePointerMove(e.offsetX, e.offsetY, false);
+        };
+
         const pointerEnter = () => {
             gol.updatePointerOver(true);
         };
@@ -469,6 +492,8 @@ export const HeroBackground = () => {
         };
 
         canvas.current.addEventListener("pointermove", pointerMove);
+        canvas.current.addEventListener("pointerdown", pointerDown);
+        canvas.current.addEventListener("pointerup", pointerUp);
         canvas.current.addEventListener("pointerenter", pointerEnter);
         canvas.current.addEventListener("pointerleave", pointerLeave);
         window.addEventListener("resize", resize);
@@ -477,6 +502,8 @@ export const HeroBackground = () => {
 
         return () => {
             canvas.current?.removeEventListener("pointermove", pointerMove);
+            canvas.current?.removeEventListener("pointerdown", pointerDown);
+            canvas.current?.removeEventListener("pointerup", pointerUp);
             canvas.current?.removeEventListener("pointerenter", pointerEnter);
             canvas.current?.removeEventListener("pointerleave", pointerLeave);
             window.removeEventListener("resize", resize);
