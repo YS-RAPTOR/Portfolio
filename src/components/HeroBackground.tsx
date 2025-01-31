@@ -6,9 +6,10 @@ const GOL_CONSTANTS = {
     SquareSize: 55,
     InnerSize: 9,
     InnerHoverSize: 15,
+    InnerHoverSizeMain: 30,
     timing: (1 / 60) * 1000,
     hoverRadius: 2,
-    pressedHoverRadius: 4,
+    pressedHoverRadius: 56,
     hoverChance: 0.15,
     backgroundColor: "9, 9, 11",
     Colors: [
@@ -62,8 +63,6 @@ float getRandom(vec2 pos){
 void main() {
     gl_FragColor = 1;
 }
-
-
 `;
 
 const DrawSource = `
@@ -85,19 +84,15 @@ vec2 getClosestSquareCenter(vec2 pos) {
 
 void main() {
 
-    float squareSize = texture2D(uSquareSizes, vUvs).x;
+    float square = texture2D(uSquareSizes, vUvs).x;
     vec4 color = texture2D(uTexture, vUvs);
 
-
-    gl_FragColor = vec4(squareSize / ${GOL_CONSTANTS.InnerSize}.0,0,0,1);
     vec2 center = getClosestSquareCenter(gl_FragCoord.xy);
 
     vec2 delta = abs(center - gl_FragCoord.xy);
-    float inside = step(delta.x, squareSize / 2.0) * step(delta.y, squareSize / 2.0);
+    float inside = step(delta.x, square/ 2.0) * step(delta.y, square/ 2.0);
 
     gl_FragColor = vec4(inside,0,0,1);
-
-
 }
 
 `;
@@ -139,6 +134,7 @@ class GOL {
     squareSizesArray: Float32Array = undefined!;
     squareSizesTexture: THREE.DataTexture = undefined!;
     nextFrame = 0;
+    refreshCommand = false;
 
     constructor(canvas: HTMLCanvasElement, width: number, height: number) {
         this.canvas = canvas;
@@ -160,8 +156,8 @@ class GOL {
                         from: "center",
                     },
                     onComplete: () => {
-                        this.initAnimationDone = true;
                         this.refreshGsap();
+                        this.initAnimationDone = true;
                     },
                 },
             );
@@ -285,6 +281,7 @@ class GOL {
         this.canvas.height = numberVertically * GOL_CONSTANTS.SquareSize;
 
         if (!init) {
+            if (this.initAnimationDone) this.refreshGsap();
             this.renderer.setSize(this.canvas.width, this.canvas.height);
         }
 
@@ -306,7 +303,6 @@ class GOL {
     };
 
     refreshGsap = () => {
-        if (!this.initAnimationDone) return;
         this.gsap.revert();
         this.gsap.add(() => {
             for (let i = 0; i < this.squareSizes.length; i++) {
@@ -314,21 +310,12 @@ class GOL {
                     this.squareSizes[i],
                     "size",
                     {
-                        ease: "power1.inOut",
-                        duration: 0.5,
+                        ease: "power3",
+                        duration: 0.2,
                     },
                 );
             }
         });
-    };
-
-    gsapSquaresHasNull = () => {
-        if (this.squareGsapHandlers.length === 0) return true;
-
-        for (let i = 0; i < this.squareGsapHandlers.length; i++) {
-            if (this.squareGsapHandlers[i] === null) return true;
-        }
-        return false;
     };
 
     updatePointerMove = (x: number, y: number, pressDown: boolean) => {
@@ -339,6 +326,43 @@ class GOL {
 
     updatePointerOver = (isOver: boolean) => {
         this.pointer.isOver = isOver;
+    };
+
+    getHoverIndices = (): [number, number[]] => {
+        if (!this.pointer.isOver) {
+            return [-1, []];
+        }
+
+        let indices: number[] = [];
+        const mainX = Math.floor(this.pointer.x / GOL_CONSTANTS.SquareSize);
+        const mainY =
+            this.numberVertically -
+            Math.floor(this.pointer.y / GOL_CONSTANTS.SquareSize) -
+            1;
+        const mainIndex = mainX + mainY * this.numberHorizontally;
+
+        const n = Math.floor(
+            GOL_CONSTANTS.hoverRadius / GOL_CONSTANTS.SquareSize,
+        );
+
+        for (let i = -n + mainX; i <= n + mainX; i++) {
+            const x =
+                i * GOL_CONSTANTS.SquareSize + GOL_CONSTANTS.SquareSize / 2;
+            const dx = mainX - x;
+            const dx2 = dx * dx;
+
+            for (let j = -n + mainY; j <= n + mainY; j++) {
+                const y =
+                    j * GOL_CONSTANTS.SquareSize + GOL_CONSTANTS.SquareSize / 2;
+                const dy = mainY - y;
+
+                if (Math.sqrt(dx2 + dy) <= GOL_CONSTANTS.hoverRadius) {
+                    indices.push(i + j * this.numberHorizontally);
+                }
+            }
+        }
+
+        return [mainIndex, indices];
     };
 
     update = () => {
@@ -355,8 +379,31 @@ class GOL {
             this.resize(this.resizeCommand.x, this.resizeCommand.y);
         }
 
+        // Check for hover
+        const [mainIndex, hoverIndices] = this.getHoverIndices();
         if (this.initAnimationDone) {
+            // console.log(this.squareGsapHandlers);
             // TODO: Update hover region
+
+            for (let i = 0; i < this.squareSizes.length; i++) {
+                if (i === mainIndex) {
+                    this.squareGsapHandlers[i]!(
+                        GOL_CONSTANTS.InnerHoverSizeMain,
+                    );
+                    continue;
+                }
+
+                if (this.pointer.isOver && hoverIndices.includes(i)) {
+                    this.squareGsapHandlers[i]!(GOL_CONSTANTS.InnerHoverSize);
+                    continue;
+                }
+
+                if (this.squareSizes[i].size === GOL_CONSTANTS.InnerSize) {
+                    continue;
+                }
+
+                this.squareGsapHandlers[i]!(GOL_CONSTANTS.InnerSize);
+            }
         }
 
         // Always should change
@@ -375,6 +422,10 @@ class GOL {
 
         for (let i = 0; i < this.squareSizes.length; i++) {
             this.squareSizesArray[i] = this.squareSizes[i].size;
+
+            if (i === mainIndex) {
+                console.log(mainIndex, this.squareSizes[i].size);
+            }
         }
 
         this.squareSizesTexture.needsUpdate = true;
@@ -415,20 +466,19 @@ export const HeroBackground = () => {
 
         const resize = () => {
             gol.resize(div.current!.clientWidth, div.current!.clientHeight);
-            gol.refreshGsap();
         };
 
-        div.current.addEventListener("pointermove", pointerMove);
-        div.current.addEventListener("pointerenter", pointerEnter);
-        div.current.addEventListener("pointerleave", pointerLeave);
+        canvas.current.addEventListener("pointermove", pointerMove);
+        canvas.current.addEventListener("pointerenter", pointerEnter);
+        canvas.current.addEventListener("pointerleave", pointerLeave);
         window.addEventListener("resize", resize);
 
         requestAnimationFrame(gol.update);
 
         return () => {
-            div.current?.removeEventListener("pointermove", pointerMove);
-            div.current?.removeEventListener("pointerenter", pointerEnter);
-            div.current?.removeEventListener("pointerleave", pointerLeave);
+            canvas.current?.removeEventListener("pointermove", pointerMove);
+            canvas.current?.removeEventListener("pointerenter", pointerEnter);
+            canvas.current?.removeEventListener("pointerleave", pointerLeave);
             window.removeEventListener("resize", resize);
         };
     }, []);
