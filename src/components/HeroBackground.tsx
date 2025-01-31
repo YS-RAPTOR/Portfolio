@@ -3,13 +3,14 @@ import { gsap } from "gsap";
 import * as THREE from "three";
 
 const GOL_CONSTANTS = {
-    SquareSize: 32,
-    InnerSize: 16,
-    InnerHoverSize: 10,
-    FpsTarget: 60,
+    SquareSize: 55,
+    InnerSize: 9,
+    InnerHoverSize: 15,
+    timing: (1 / 60) * 1000,
     hoverRadius: 2,
     pressedHoverRadius: 4,
     hoverChance: 0.15,
+    backgroundColor: "9, 9, 11",
     Colors: [
         new THREE.Color(0x050505), // Dead Color
         new THREE.Color(0x3730a3),
@@ -31,6 +32,76 @@ const GOL_CONSTANTS = {
     ],
 };
 
+const VertSource = `
+varying vec2 vUvs;
+
+void main() {
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    vUvs = uv;
+}
+`;
+
+const GOLSource = `
+precision mediump float;
+
+const float randomOccurence = 0.1;
+
+uniform sampler2D uTexture;
+uniform vec2 uResolution;
+uniform ivec3 uPointer;
+uniform float uSeed;
+uniform bool uGenerate;
+varying vec2 vUvs;
+
+
+float getRandom(vec2 pos){
+    return abs(fract(sin(dot(pos + vec2(uSeed), vec2(12.9898, 78.233))) * 43758.5453));
+}
+
+
+void main() {
+    gl_FragColor = 1;
+}
+
+
+`;
+
+const DrawSource = `
+precision mediump float;
+
+uniform sampler2D uTexture; 
+uniform sampler2D uSquareSizes;
+
+varying vec2 vUvs;
+
+const float squareSize = ${GOL_CONSTANTS.SquareSize}.0;
+const vec4 backgroundColor = vec4(${GOL_CONSTANTS.backgroundColor},0);
+
+vec2 getClosestSquareCenter(vec2 pos) {
+
+    vec2 index = vec2(floor(pos.x / squareSize), floor(pos.y / squareSize));
+    return index.xy * vec2(squareSize) + vec2(squareSize / 2.0);
+}
+
+void main() {
+
+    float squareSize = texture2D(uSquareSizes, vUvs).x;
+    vec4 color = texture2D(uTexture, vUvs);
+
+
+    gl_FragColor = vec4(squareSize / ${GOL_CONSTANTS.InnerSize}.0,0,0,1);
+    vec2 center = getClosestSquareCenter(gl_FragCoord.xy);
+
+    vec2 delta = abs(center - gl_FragCoord.xy);
+    float inside = step(delta.x, squareSize / 2.0) * step(delta.y, squareSize / 2.0);
+
+    gl_FragColor = vec4(inside,0,0,1);
+
+
+}
+
+`;
+
 class GOL {
     numberHorizontally = 0;
     numberVertically = 0;
@@ -42,12 +113,37 @@ class GOL {
     };
     canvas: HTMLCanvasElement;
     squareSizes: { size: number }[] = [];
-    squareGsapHandlers: (gsap.core.Tween | null)[] = [];
+    squareGsapHandlers: (gsap.QuickToFunc | null)[] = [];
     gsap: gsap.Context;
+    initAnimationDone = false;
+    resizeCommand: {
+        x: number;
+        y: number;
+        yes: boolean;
+    } = {
+        x: 0,
+        y: 0,
+        yes: false,
+    };
+
+    // NOTE: Shader variables
+    buffers: [THREE.WebGLRenderTarget, THREE.WebGLRenderTarget];
+    golScene: THREE.Scene;
+    drawScene: THREE.Scene;
+    drawMaterial: THREE.ShaderMaterial;
+    GolMaterial: THREE.ShaderMaterial;
+    camera: THREE.OrthographicCamera;
+    renderer: THREE.WebGLRenderer;
+    // NOTE: x = -1, y = -1 means not over
+    // z = pressed status | xy = position
+    squareSizesArray: Float32Array = undefined!;
+    squareSizesTexture: THREE.DataTexture = undefined!;
+    nextFrame = 0;
 
     constructor(canvas: HTMLCanvasElement, width: number, height: number) {
         this.canvas = canvas;
-        this.resize(width, height);
+        this.resize(width, height, true);
+
         this.gsap = gsap.context(() => {
             gsap.fromTo(
                 this.squareSizes,
@@ -55,22 +151,109 @@ class GOL {
                     size: 0,
                 },
                 {
+                    ease: "power1.inOut",
                     size: GOL_CONSTANTS.InnerSize,
+                    duration: 1,
                     stagger: {
-                        grid: [this.numberHorizontally, this.numberVertically],
-                        amount: 2,
-                        ease: "power2.out",
+                        grid: [this.numberVertically, this.numberHorizontally],
+                        amount: 1.5,
                         from: "center",
                     },
                     onComplete: () => {
+                        this.initAnimationDone = true;
                         this.refreshGsap();
                     },
                 },
             );
         });
+
+        const bufferOptions: THREE.RenderTargetOptions = {
+            minFilter: THREE.NearestFilter,
+            magFilter: THREE.NearestFilter,
+            format: THREE.RedFormat,
+            type: THREE.UnsignedByteType,
+            stencilBuffer: false,
+            depthBuffer: false,
+            generateMipmaps: false,
+            resolveDepthBuffer: false,
+            resolveStencilBuffer: false,
+        };
+
+        this.buffers = [
+            new THREE.WebGLRenderTarget(
+                this.numberHorizontally,
+                this.numberVertically,
+                bufferOptions,
+            ),
+            new THREE.WebGLRenderTarget(
+                this.numberHorizontally,
+                this.numberVertically,
+                bufferOptions,
+            ),
+        ];
+
+        // All of the needed uniforms
+        const initialTexture = new THREE.DataTexture(
+            new Uint8Array(this.numberHorizontally * this.numberVertically),
+            this.numberHorizontally,
+            this.numberVertically,
+            THREE.RedFormat,
+            THREE.UnsignedByteType,
+        );
+
+        // TODO: Move to resize function
+
+        this.golScene = new THREE.Scene();
+        this.drawScene = new THREE.Scene();
+
+        const drawGeometry = new THREE.PlaneGeometry(2, 2);
+        this.drawMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                uTexture: { value: null },
+                uSquareSizes: { value: this.squareSizesTexture },
+            },
+            vertexShader: VertSource,
+            fragmentShader: DrawSource,
+        });
+
+        this.GolMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                uTexture: { value: initialTexture },
+                uResolution: {
+                    value: new THREE.Vector2(
+                        this.numberHorizontally,
+                        this.numberVertically,
+                    ),
+                },
+                uPointer: { value: new THREE.Vector3(-1, -1, 0) },
+                uSeed: { value: 0 },
+                uGenerate: { value: 0 },
+            },
+            vertexShader: VertSource,
+            fragmentShader: GOLSource,
+        });
+
+        const drawMesh = new THREE.Mesh(drawGeometry, this.drawMaterial);
+        const GolMesh = new THREE.Mesh(drawGeometry, this.GolMaterial);
+        this.drawScene.add(drawMesh);
+        this.golScene.add(GolMesh);
+
+        this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+        this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas });
+        this.renderer.setPixelRatio(1);
+        this.renderer.setSize(this.canvas.width, this.canvas.height);
     }
 
-    resize = (width: number, height: number) => {
+    resize = (width: number, height: number, init = false) => {
+        if (!this.initAnimationDone && !init) {
+            this.resizeCommand = {
+                x: width,
+                y: height,
+                yes: true,
+            };
+            return;
+        }
+
         const numberHorizontally = Math.floor(width / GOL_CONSTANTS.SquareSize);
         const numberVertically = Math.floor(height / GOL_CONSTANTS.SquareSize);
 
@@ -81,6 +264,7 @@ class GOL {
             return;
         }
 
+        // TODO: Update this array more intelligently
         const totalDifference =
             numberHorizontally * numberVertically -
             this.numberHorizontally * this.numberVertically;
@@ -99,25 +283,39 @@ class GOL {
 
         this.canvas.width = numberHorizontally * GOL_CONSTANTS.SquareSize;
         this.canvas.height = numberVertically * GOL_CONSTANTS.SquareSize;
+
+        if (!init) {
+            this.renderer.setSize(this.canvas.width, this.canvas.height);
+        }
+
+        this.squareSizesArray = new Float32Array(
+            this.numberHorizontally * this.numberVertically,
+        );
+        for (let i = 0; i < this.squareSizes.length; i++) {
+            this.squareSizesArray[i] = this.squareSizes[i].size;
+        }
+        this.squareSizesTexture = new THREE.DataTexture(
+            this.squareSizesArray,
+            this.numberHorizontally,
+            this.numberVertically,
+            THREE.RedFormat,
+            THREE.FloatType,
+        );
+
+        this.resizeCommand.yes = false;
     };
 
     refreshGsap = () => {
+        if (!this.initAnimationDone) return;
         this.gsap.revert();
         this.gsap.add(() => {
             for (let i = 0; i < this.squareSizes.length; i++) {
-                this.squareGsapHandlers[i] = gsap.fromTo(
+                this.squareGsapHandlers[i] = gsap.quickTo(
                     this.squareSizes[i],
+                    "size",
                     {
-                        size: GOL_CONSTANTS.InnerSize,
                         ease: "power1.inOut",
                         duration: 0.5,
-                        paused: true,
-                    },
-                    {
-                        size: GOL_CONSTANTS.InnerHoverSize,
-                        ease: "power1.inOut",
-                        duration: 0.5,
-                        paused: true,
                     },
                 );
             }
@@ -144,7 +342,48 @@ class GOL {
     };
 
     update = () => {
-        // requestAnimationFrame(this.update);
+        // Timings
+        if (this.nextFrame <= Date.now()) {
+            this.nextFrame = Date.now() + GOL_CONSTANTS.timing;
+
+            if (this.initAnimationDone) {
+                this.GolMaterial.uniforms.uGenerate!.value = 1;
+            }
+        }
+
+        if (this.initAnimationDone && this.resizeCommand.yes) {
+            this.resize(this.resizeCommand.x, this.resizeCommand.y);
+        }
+
+        if (this.initAnimationDone) {
+            // TODO: Update hover region
+        }
+
+        // Always should change
+        this.GolMaterial.uniforms.uSeed!.value += 0.0001;
+
+        // Pointer Information
+        if (this.pointer.isOver) {
+            this.GolMaterial.uniforms.uPointer!.value.set(
+                this.pointer.x,
+                this.pointer.y,
+                this.pointer.pressDown ? 1 : 0,
+            );
+        } else {
+            this.GolMaterial.uniforms.uPointer!.value.set(-1, -1, 0);
+        }
+
+        for (let i = 0; i < this.squareSizes.length; i++) {
+            this.squareSizesArray[i] = this.squareSizes[i].size;
+        }
+
+        this.squareSizesTexture.needsUpdate = true;
+
+        this.renderer.setRenderTarget(null);
+        this.renderer.render(this.drawScene, this.camera);
+
+        this.GolMaterial.uniforms.uGenerate!.value = 0;
+        requestAnimationFrame(this.update);
     };
 }
 
@@ -155,6 +394,7 @@ export const HeroBackground = () => {
     useEffect(() => {
         if (!canvas.current || !div.current) return;
 
+        // TODO FIX THIS
         const gol = new GOL(
             canvas.current,
             div.current.clientWidth,

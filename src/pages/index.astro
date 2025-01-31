@@ -3,6 +3,7 @@ import Base from "../layouts/Base.astro";
 import { Logo } from "../components/Logo.tsx";
 import { HeroBackground } from "../components/HeroBackground.tsx";
 import { Rewrite } from "../components/Rewrite.tsx";
+import { Test } from "../components/Test.tsx";
 ---
 
 <Base>
@@ -34,6 +35,7 @@ import { Rewrite } from "../components/Rewrite.tsx";
     <main id="Hero" class="flex h-fit justify-center border-b">
         <div class="flex h-fit w-full justify-end border-x md:w-2/3">
             <HeroBackground client:load />
+            <!-- <Test client:only /> -->
         </div>
     </main>
     <section id="Projects">
