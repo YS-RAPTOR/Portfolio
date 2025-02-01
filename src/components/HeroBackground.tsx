@@ -2,34 +2,53 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import * as THREE from "three";
 
+// TODO: Style All of this better
+
+const ConvertColors = (colors: string[]) => {
+    let str = "";
+
+    for (let i = 0; i < colors.length; i++) {
+        const color = colors[i];
+        const r = parseInt(color.slice(1, 3), 16) / 255;
+        const g = parseInt(color.slice(3, 5), 16) / 255;
+        const b = parseInt(color.slice(5, 7), 16) / 255;
+
+        str += `vec4(${r.toFixed(2)}, ${g.toFixed(2)}, ${b.toFixed(2)}, 1.0),\n`;
+    }
+    str = str.slice(0, -2);
+    return str;
+};
+
 const GOL_CONSTANTS = {
-    SquareSize: 55,
-    InnerSize: 9,
-    InnerHoverSize: 15,
-    InnerHoverSizeMain: 30,
-    timing: (1 / 60) * 1000,
-    hoverRadius: 100,
-    pressedHoverRadius: 125,
-    hoverChance: 0.15,
-    backgroundColor: "9, 9, 11",
+    SquareSize: 35,
+    InnerSize: 15,
+    HoverSize: 21,
+    MainHoverSize: 31,
+    HoverDrawRadius: 100,
+    PressedHoverDrawRadius: 125,
+
+    Timing: (1 / 10) * 1000,
+    HoverGolRadius: 0.025,
+    PressedHoverGolRadius: 0.05,
+    GlobalChance: 0.00000000001,
     Colors: [
-        new THREE.Color(0x050505), // Dead Color
-        new THREE.Color(0x3730a3),
-        new THREE.Color(0x7e22ce),
-        new THREE.Color(0xc026d3),
-        new THREE.Color(0xc026d3),
-        new THREE.Color(0xec4899),
-        new THREE.Color(0xe11d48),
-        new THREE.Color(0xfbbf24),
-        new THREE.Color(0xbef264),
-        new THREE.Color(0xfbbf24),
-        new THREE.Color(0xe11d48),
-        new THREE.Color(0xec4899),
-        new THREE.Color(0xc026d3),
-        new THREE.Color(0xc026d3),
-        new THREE.Color(0x7e22ce),
-        new THREE.Color(0x3730a3),
-        new THREE.Color(0x050505), // Static Color
+        "#050505",
+        "#3730a3",
+        "#7e22ce",
+        "#c026d3",
+        "#c026d3",
+        "#ec4899",
+        "#e11d48",
+        "#fbbf24",
+        "#bef264",
+        "#fbbf24",
+        "#e11d48",
+        "#ec4899",
+        "#c026d3",
+        "#c026d3",
+        "#7e22ce",
+        "#3730a3",
+        "#050505",
     ],
 };
 
@@ -43,25 +62,92 @@ void main() {
 `;
 
 const GOLSource = `
-precision mediump float;
+precision highp float;
 
 const float randomOccurence = 0.1;
 
 uniform sampler2D uTexture;
 uniform vec2 uResolution;
+uniform vec2 uCanvasResolution;
 uniform ivec3 uPointer;
+uniform int uFrame;
 uniform float uSeed;
 uniform bool uGenerate;
 varying vec2 vUvs;
 
-
 float getRandom(vec2 pos){
-    return abs(fract(sin(dot(pos + vec2(uSeed), vec2(12.9898, 78.233))) * 43758.5453));
+    vec2 nudge = vec2(uFrame) + vec2(uPointer.xy) / uCanvasResolution + uResolution + vec2(uSeed);
+    return abs(fract(sin(dot(pos + nudge, vec2(12.9898, 78.233))) * 43758.5453));
 }
 
+int getNeighbours(vec2 pos){
+    int count = 0;
+
+    for(int i = -1; i <= 1; i++){
+        for(int j = -1; j <= 1; j++){
+            count += int(texture2D(uTexture, mod(pos + vec2(i, j) / uResolution, vec2(1))).y);
+        }
+    }
+
+    count -= int(texture2D(uTexture, pos).y);
+    return count;
+}
+
+float getRandomColor(vec2 pos) {
+    float random = getRandom(pos);
+    return clamp(floor(random * ${GOL_CONSTANTS.Colors.length}.0), 0.0, ${GOL_CONSTANTS.Colors.length - 1}.0);
+}
 
 void main() {
-    gl_FragColor = 1;
+    gl_FragColor = texture2D(uTexture, vUvs);
+
+    if(uGenerate) {
+        bool alive = gl_FragColor.y > 0.5;
+
+        gl_FragColor.x -= 1.0;
+        gl_FragColor.y = 0.0;
+
+        int n = getNeighbours(vUvs);
+        // Birthing rules
+        if(!alive && (n == 3 || n == 6)){
+            gl_FragColor.x += 1.0;
+            gl_FragColor.y = 1.0;
+        // Survival rules
+        }else if(alive && (n == 2 || n == 3)){
+            gl_FragColor.x += 2.0;
+            gl_FragColor.y = 1.0;
+        }
+
+        float random = getRandom(vUvs);
+        if(random < ${GOL_CONSTANTS.GlobalChance}){
+            random = getRandom(vUvs + vec2(0.1));
+            gl_FragColor.y = step(random, 0.5);
+            gl_FragColor.x = getRandomColor(vUvs - vec2(0.1)) * gl_FragColor.y;
+
+        }
+    }
+
+    // Hover Behaviour
+    if(uPointer.x != -1 && uPointer.y != -1){
+        vec2 aspect = vec2(uCanvasResolution.x / uCanvasResolution.y, 1.0);
+        vec2 diff = vUvs - vec2(uPointer.xy) / uCanvasResolution;
+        vec2 wrappDif = min(abs(diff), vec2(1.0) - abs(diff));
+        wrappDif *= aspect;
+        
+        float distanceFromPointer = length(wrappDif);
+        float dist = float(uPointer.z) * ${GOL_CONSTANTS.PressedHoverGolRadius} + float(1 - uPointer.z) * ${GOL_CONSTANTS.HoverGolRadius};
+
+        if(distanceFromPointer < dist){
+            gl_FragColor.x = getRandomColor(vUvs);
+            gl_FragColor.y = 1.0;
+        }
+    }
+
+    if(uFrame == 0){
+        gl_FragColor.x = getRandomColor(vUvs);
+    };
+
+    gl_FragColor.x = clamp(gl_FragColor.x, 0.0, ${GOL_CONSTANTS.Colors.length - 1}.0);
 }
 `;
 
@@ -73,28 +159,42 @@ uniform sampler2D uSquareSizes;
 
 varying vec2 vUvs;
 
+vec4 colors[${GOL_CONSTANTS.Colors.length}] = vec4[](${ConvertColors(GOL_CONSTANTS.Colors)});
+    // vec4(0.02, 0.02, 0.02, 1.0),
+    // vec4(0.22, 0.19, 0.64, 1.0),
+    // vec4(0.49, 0.13, 0.81, 1.0),
+    // vec4(0.75, 0.15, 0.83, 1.0),
+    // vec4(0.75, 0.15, 0.83, 1.0),
+    // vec4(0.93, 0.28, 0.60, 1.0),
+    // vec4(0.88, 0.11, 0.28, 1.0),
+    // vec4(0.98, 0.75, 0.14, 1.0),
+    // vec4(0.75, 0.95, 0.39, 1.0),
+    // vec4(0.98, 0.75, 0.14, 1.0),
+    // vec4(0.88, 0.11, 0.28, 1.0),
+    // vec4(0.93, 0.28, 0.60, 1.0),
+    // vec4(0.75, 0.15, 0.83, 1.0),
+    // vec4(0.75, 0.15, 0.83, 1.0),
+    // vec4(0.49, 0.13, 0.81, 1.0),
+    // vec4(0.22, 0.19, 0.64, 1.0),
+    // vec4(0.02, 0.02, 0.02, 1.0)
+
 const float squareSize = ${GOL_CONSTANTS.SquareSize}.0;
-const vec4 backgroundColor = vec4(${GOL_CONSTANTS.backgroundColor},0);
 
 vec2 getClosestSquareCenter(vec2 pos) {
-
     vec2 index = vec2(floor(pos.x / squareSize), floor(pos.y / squareSize));
     return index.xy * vec2(squareSize) + vec2(squareSize / 2.0);
 }
 
 void main() {
-
     float square = texture2D(uSquareSizes, vUvs).x;
-    vec4 color = texture2D(uTexture, vUvs);
-
+    vec4 color = colors[int(texture2D(uTexture, vUvs).x)];
     vec2 center = getClosestSquareCenter(gl_FragCoord.xy);
 
     vec2 delta = abs(center - gl_FragCoord.xy);
     float inside = step(delta.x, square/ 2.0) * step(delta.y, square/ 2.0);
 
-    gl_FragColor = vec4(inside,0,0,1);
+    gl_FragColor = color*vec4(inside) + colors[0]*vec4(1.0-inside);
 }
-
 `;
 
 class GOL {
@@ -166,8 +266,8 @@ class GOL {
         const bufferOptions: THREE.RenderTargetOptions = {
             minFilter: THREE.NearestFilter,
             magFilter: THREE.NearestFilter,
-            format: THREE.RedFormat,
-            type: THREE.UnsignedByteType,
+            format: THREE.RGFormat,
+            type: THREE.FloatType,
             stencilBuffer: false,
             depthBuffer: false,
             generateMipmaps: false,
@@ -189,15 +289,18 @@ class GOL {
         ];
 
         // All of the needed uniforms
+
+        const array = new Float32Array(
+            this.numberHorizontally * this.numberVertically * 2,
+        ).fill(10);
+
         const initialTexture = new THREE.DataTexture(
-            new Uint8Array(this.numberHorizontally * this.numberVertically),
+            array,
             this.numberHorizontally,
             this.numberVertically,
-            THREE.RedFormat,
-            THREE.UnsignedByteType,
+            THREE.RGFormat,
+            THREE.FloatType,
         );
-
-        // TODO: Move to resize function
 
         this.golScene = new THREE.Scene();
         this.drawScene = new THREE.Scene();
@@ -205,7 +308,7 @@ class GOL {
         const drawGeometry = new THREE.PlaneGeometry(2, 2);
         this.drawMaterial = new THREE.ShaderMaterial({
             uniforms: {
-                uTexture: { value: null },
+                uTexture: { value: initialTexture.clone() },
                 uSquareSizes: { value: this.squareSizesTexture },
             },
             vertexShader: VertSource,
@@ -221,9 +324,16 @@ class GOL {
                         this.numberVertically,
                     ),
                 },
+                uCanvasResolution: {
+                    value: new THREE.Vector2(
+                        this.canvas.width,
+                        this.canvas.height,
+                    ),
+                },
                 uPointer: { value: new THREE.Vector3(-1, -1, 0) },
-                uSeed: { value: 0 },
+                uFrame: { value: 0 },
                 uGenerate: { value: 0 },
+                uSeed: { value: Math.random() },
             },
             vertexShader: VertSource,
             fragmentShader: GOLSource,
@@ -260,7 +370,6 @@ class GOL {
             return;
         }
 
-        // TODO: Update this array more intelligently
         const totalDifference =
             numberHorizontally * numberVertically -
             this.numberHorizontally * this.numberVertically;
@@ -322,7 +431,7 @@ class GOL {
 
     updatePointerMove = (x: number, y: number, pressDown: boolean) => {
         this.pointer.x = Math.floor(x);
-        this.pointer.y = Math.floor(y);
+        this.pointer.y = this.canvas.height - Math.floor(y);
         this.pointer.pressDown = pressDown;
         this.pointer.isOver = true;
     };
@@ -340,16 +449,15 @@ class GOL {
         const mainX = Math.trunc(
             (this.pointer.x - 0.1) / GOL_CONSTANTS.SquareSize,
         );
-        const mainY =
-            this.numberVertically -
-            Math.trunc((this.pointer.y - 0.1) / GOL_CONSTANTS.SquareSize) -
-            1;
+        const mainY = Math.trunc(
+            (this.pointer.y - 0.1) / GOL_CONSTANTS.SquareSize,
+        );
 
         const mainIndex = mainX + mainY * this.numberHorizontally;
 
         const radius = this.pointer.pressDown
-            ? GOL_CONSTANTS.pressedHoverRadius
-            : GOL_CONSTANTS.hoverRadius;
+            ? GOL_CONSTANTS.PressedHoverDrawRadius
+            : GOL_CONSTANTS.HoverDrawRadius;
         const n = Math.floor(radius / GOL_CONSTANTS.SquareSize);
 
         for (let i = -n + mainX; i <= n + mainX; i++) {
@@ -388,7 +496,7 @@ class GOL {
     update = () => {
         // Timings
         if (this.nextFrame <= Date.now()) {
-            this.nextFrame = Date.now() + GOL_CONSTANTS.timing;
+            this.nextFrame = Date.now() + GOL_CONSTANTS.Timing;
 
             if (this.initAnimationDone) {
                 this.GolMaterial.uniforms.uGenerate!.value = 1;
@@ -402,18 +510,15 @@ class GOL {
         // Check for hover
         const [mainIndex, hoverIndices] = this.getHoverIndices();
         if (this.initAnimationDone) {
-            // TODO: Update hover region
-
+            // Update once initAnimationDone
             for (let i = 0; i < this.squareSizes.length; i++) {
                 if (i === mainIndex) {
-                    this.squareGsapHandlers[i]!(
-                        GOL_CONSTANTS.InnerHoverSizeMain,
-                    );
+                    this.squareGsapHandlers[i]!(GOL_CONSTANTS.MainHoverSize);
                     continue;
                 }
 
                 if (this.pointer.isOver && hoverIndices.includes(i)) {
-                    this.squareGsapHandlers[i]!(GOL_CONSTANTS.InnerHoverSize);
+                    this.squareGsapHandlers[i]!(GOL_CONSTANTS.HoverSize);
                     continue;
                 }
 
@@ -424,9 +529,6 @@ class GOL {
                 this.squareGsapHandlers[i]!(GOL_CONSTANTS.InnerSize);
             }
         }
-
-        // Always should change
-        this.GolMaterial.uniforms.uSeed!.value += 0.0001;
 
         // Pointer Information
         if (this.pointer.isOver) {
@@ -442,13 +544,27 @@ class GOL {
         for (let i = 0; i < this.squareSizes.length; i++) {
             this.squareSizesArray[i] = this.squareSizes[i].size;
         }
-
         this.squareSizesTexture.needsUpdate = true;
 
+        // Render to Front Buffer
+        this.renderer.setRenderTarget(this.buffers[0]);
+        this.renderer.render(this.golScene, this.camera);
+
+        // Render to Screen
+        this.drawMaterial.uniforms.uTexture!.value = this.buffers[0].texture;
         this.renderer.setRenderTarget(null);
         this.renderer.render(this.drawScene, this.camera);
 
+        // Swap Buffers
+        const temp = this.buffers[0];
+        this.buffers[0] = this.buffers[1];
+        this.buffers[1] = temp;
+
+        // Update GOL Material
+        this.GolMaterial.uniforms.uTexture!.value = this.buffers[1].texture;
         this.GolMaterial.uniforms.uGenerate!.value = 0;
+        this.GolMaterial.uniforms.uFrame!.value += 1;
+        this.GolMaterial.uniforms.uSeed!.value = Math.random();
         requestAnimationFrame(this.update);
     };
 }
@@ -460,7 +576,6 @@ export const HeroBackground = () => {
     useEffect(() => {
         if (!canvas.current || !div.current) return;
 
-        // TODO FIX THIS
         const gol = new GOL(
             canvas.current,
             div.current.clientWidth,
@@ -513,7 +628,7 @@ export const HeroBackground = () => {
     return (
         <div
             ref={div}
-            className="relative flex h-fit min-h-[80vh] w-full items-center justify-center bg-red-600"
+            className="relative flex h-fit min-h-[80vh] w-full items-center justify-center"
         >
             <canvas ref={canvas} className="absolute z-10"></canvas>
         </div>
