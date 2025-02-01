@@ -19,7 +19,7 @@ const ConvertColors = (colors: string[]) => {
     return str;
 };
 
-const ConvertGolRules = (rules: string) => {
+const ConvertGolRules = (rules: string, time: number) => {
     const ruleArray = rules.split("/");
     let birth = "";
     let survive = "";
@@ -48,6 +48,7 @@ const ConvertGolRules = (rules: string) => {
     return {
         birthRules: birthRules,
         surviveRules: surviveRules,
+        time: time * 1000,
     };
 };
 
@@ -60,8 +61,7 @@ const GOL_CONSTANTS = {
     PressedHoverDrawRadius: 125,
 
     Timing: (1 / 30) * 1000,
-    GolRules: [ConvertGolRules("B3/S12345")],
-    RuleSwapTimeSeconds: 10 * 1000,
+    GolRules: [ConvertGolRules("B2468/S012345678", 1)],
     HoverGolRadius: 0.025,
     PressedHoverGolRadius: 0.05,
     GlobalChance: 0.01,
@@ -251,7 +251,7 @@ class GOL {
     squareSizesTexture: THREE.DataTexture = undefined!;
     nextFrame = 0;
     refreshCommand = false;
-    nextRuleSwap = Date.now() + GOL_CONSTANTS.RuleSwapTimeSeconds;
+    nextRuleSwap: number;
 
     constructor(canvas: HTMLCanvasElement, width: number, height: number) {
         this.canvas = canvas;
@@ -322,6 +322,7 @@ class GOL {
         });
 
         const rule = choice(GOL_CONSTANTS.GolRules);
+        this.nextRuleSwap = Date.now() + rule.time;
         this.GolMaterial = new THREE.ShaderMaterial({
             uniforms: {
                 uTexture: { value: initialTexture },
@@ -566,8 +567,8 @@ class GOL {
 
         // Rule Swap
         if (this.nextRuleSwap <= Date.now()) {
-            this.nextRuleSwap = Date.now() + GOL_CONSTANTS.RuleSwapTimeSeconds;
             const rule = choice(GOL_CONSTANTS.GolRules);
+            this.nextRuleSwap = Date.now() + rule.time;
             this.GolMaterial.uniforms.uBirthRules!.value = rule.birthRules;
             this.GolMaterial.uniforms.uSurviveRules!.value = rule.surviveRules;
         }
@@ -611,7 +612,7 @@ class GOL {
                 this.GolMaterial.uniforms.uPointer!.value.set(
                     Math.floor(Math.random() * this.canvas.width),
                     Math.floor(Math.random() * this.canvas.height),
-                    0,
+                    Math.random() < 0.5 ? 1 : 0,
                 );
             } else {
                 this.GolMaterial.uniforms.uPointer!.value.set(-1, -1, 0);
