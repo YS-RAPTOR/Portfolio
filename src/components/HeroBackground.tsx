@@ -19,6 +19,38 @@ const ConvertColors = (colors: string[]) => {
     return str;
 };
 
+const ConvertGolRules = (rules: string) => {
+    const ruleArray = rules.split("/");
+    let birth = "";
+    let survive = "";
+
+    if (ruleArray[0][0] === "B" && ruleArray[1][0] === "S") {
+        birth = ruleArray[0].slice(1);
+        survive = ruleArray[1].slice(1);
+    } else if (ruleArray[0][0] === "S" && ruleArray[1][0] === "B") {
+        birth = ruleArray[1].slice(1);
+        survive = ruleArray[0].slice(1);
+    } else {
+        throw new Error("Invalid Rule Format");
+    }
+
+    const birthRules = new Array<number>(8).fill(0);
+    const surviveRules = new Array<number>(8).fill(0);
+
+    for (let i = 0; i < birth.length; i++) {
+        birthRules[parseInt(birth[i])] = 1;
+    }
+
+    for (let i = 0; i < survive.length; i++) {
+        surviveRules[parseInt(survive[i])] = 1;
+    }
+
+    return {
+        birthRules: birthRules,
+        surviveRules: surviveRules,
+    };
+};
+
 const GOL_CONSTANTS = {
     SquareSize: 35,
     InnerSize: 15,
@@ -27,10 +59,12 @@ const GOL_CONSTANTS = {
     HoverDrawRadius: 100,
     PressedHoverDrawRadius: 125,
 
-    Timing: (1 / 10) * 1000,
+    Timing: (1 / 30) * 1000,
+    GolRules: [ConvertGolRules("B3/S12345")],
+    RuleSwapTimeSeconds: 10 * 1000,
     HoverGolRadius: 0.025,
     PressedHoverGolRadius: 0.05,
-    GlobalChance: 0.00000000001,
+    GlobalChance: 0.01,
     Colors: [
         "#050505",
         "#3730a3",
@@ -46,11 +80,15 @@ const GOL_CONSTANTS = {
         "#ec4899",
         "#c026d3",
         "#c026d3",
+        "#050505",
         "#7e22ce",
         "#3730a3",
-        "#050505",
     ],
 };
+
+function choice<T>(array: T[]): T {
+    return array[Math.floor(Math.random() * array.length)];
+}
 
 const VertSource = `
 varying vec2 vUvs;
@@ -73,6 +111,10 @@ uniform ivec3 uPointer;
 uniform int uFrame;
 uniform float uSeed;
 uniform bool uGenerate;
+
+uniform int uBirthRules[8];
+uniform int uSurviveRules[8];
+
 varying vec2 vUvs;
 
 float getRandom(vec2 pos){
@@ -109,21 +151,13 @@ void main() {
 
         int n = getNeighbours(vUvs);
         // Birthing rules
-        if(!alive && (n == 3 || n == 6)){
+        if(!alive && uBirthRules[n] == 1){
             gl_FragColor.x += 1.0;
             gl_FragColor.y = 1.0;
         // Survival rules
-        }else if(alive && (n == 2 || n == 3)){
+        }else if(alive && uSurviveRules[n] == 1){
             gl_FragColor.x += 2.0;
             gl_FragColor.y = 1.0;
-        }
-
-        float random = getRandom(vUvs);
-        if(random < ${GOL_CONSTANTS.GlobalChance}){
-            random = getRandom(vUvs + vec2(0.1));
-            gl_FragColor.y = step(random, 0.5);
-            gl_FragColor.x = getRandomColor(vUvs - vec2(0.1)) * gl_FragColor.y;
-
         }
     }
 
@@ -160,24 +194,6 @@ uniform sampler2D uSquareSizes;
 varying vec2 vUvs;
 
 vec4 colors[${GOL_CONSTANTS.Colors.length}] = vec4[](${ConvertColors(GOL_CONSTANTS.Colors)});
-    // vec4(0.02, 0.02, 0.02, 1.0),
-    // vec4(0.22, 0.19, 0.64, 1.0),
-    // vec4(0.49, 0.13, 0.81, 1.0),
-    // vec4(0.75, 0.15, 0.83, 1.0),
-    // vec4(0.75, 0.15, 0.83, 1.0),
-    // vec4(0.93, 0.28, 0.60, 1.0),
-    // vec4(0.88, 0.11, 0.28, 1.0),
-    // vec4(0.98, 0.75, 0.14, 1.0),
-    // vec4(0.75, 0.95, 0.39, 1.0),
-    // vec4(0.98, 0.75, 0.14, 1.0),
-    // vec4(0.88, 0.11, 0.28, 1.0),
-    // vec4(0.93, 0.28, 0.60, 1.0),
-    // vec4(0.75, 0.15, 0.83, 1.0),
-    // vec4(0.75, 0.15, 0.83, 1.0),
-    // vec4(0.49, 0.13, 0.81, 1.0),
-    // vec4(0.22, 0.19, 0.64, 1.0),
-    // vec4(0.02, 0.02, 0.02, 1.0)
-
 const float squareSize = ${GOL_CONSTANTS.SquareSize}.0;
 
 vec2 getClosestSquareCenter(vec2 pos) {
@@ -235,6 +251,7 @@ class GOL {
     squareSizesTexture: THREE.DataTexture = undefined!;
     nextFrame = 0;
     refreshCommand = false;
+    nextRuleSwap = Date.now() + GOL_CONSTANTS.RuleSwapTimeSeconds;
 
     constructor(canvas: HTMLCanvasElement, width: number, height: number) {
         this.canvas = canvas;
@@ -290,18 +307,7 @@ class GOL {
 
         // All of the needed uniforms
 
-        const array = new Float32Array(
-            this.numberHorizontally * this.numberVertically * 2,
-        ).fill(10);
-
-        const initialTexture = new THREE.DataTexture(
-            array,
-            this.numberHorizontally,
-            this.numberVertically,
-            THREE.RGFormat,
-            THREE.FloatType,
-        );
-
+        const initialTexture = this.createTexture(0);
         this.golScene = new THREE.Scene();
         this.drawScene = new THREE.Scene();
 
@@ -315,6 +321,7 @@ class GOL {
             fragmentShader: DrawSource,
         });
 
+        const rule = choice(GOL_CONSTANTS.GolRules);
         this.GolMaterial = new THREE.ShaderMaterial({
             uniforms: {
                 uTexture: { value: initialTexture },
@@ -334,6 +341,8 @@ class GOL {
                 uFrame: { value: 0 },
                 uGenerate: { value: 0 },
                 uSeed: { value: Math.random() },
+                uBirthRules: { value: rule.birthRules },
+                uSurviveRules: { value: rule.surviveRules },
             },
             vertexShader: VertSource,
             fragmentShader: GOLSource,
@@ -349,6 +358,40 @@ class GOL {
         this.renderer.setPixelRatio(1);
         this.renderer.setSize(this.canvas.width, this.canvas.height);
     }
+
+    createTexture = (n: number | "random") => {
+        const array = new Float32Array(
+            this.numberHorizontally * this.numberVertically * 2,
+        );
+
+        if (n === "random") {
+            for (let i = 0; i < array.length; i += 2) {
+                if (Math.random() < 0.5) {
+                    array[i] = Math.floor(
+                        Math.random() * GOL_CONSTANTS.Colors.length,
+                    );
+                    array[i + 1] = 1;
+                } else {
+                    array[i] = 0;
+                    array[i + 1] = 0;
+                }
+            }
+        } else {
+            const alive = n == 0 ? 0 : 1;
+            for (let i = 0; i < array.length; i += 2) {
+                array[i] = n;
+                array[i + 1] = alive;
+            }
+        }
+
+        return new THREE.DataTexture(
+            array,
+            this.numberHorizontally,
+            this.numberVertically,
+            THREE.RGFormat,
+            THREE.FloatType,
+        );
+    };
 
     resize = (width: number, height: number, init = false) => {
         if (!this.initAnimationDone && !init) {
@@ -408,8 +451,26 @@ class GOL {
             this.drawMaterial.uniforms.uSquareSizes!.value =
                 this.squareSizesTexture;
 
+            this.buffers[0].setSize(
+                this.numberHorizontally,
+                this.numberVertically,
+            );
+            this.buffers[1].setSize(
+                this.numberHorizontally,
+                this.numberVertically,
+            );
+
+            const texture = this.createTexture("random");
+            this.GolMaterial.uniforms.uTexture!.value = texture;
+            this.drawMaterial.uniforms.uTexture!.value = texture.clone();
+            this.GolMaterial.uniforms.uCanvasResolution!.value.set(
+                this.canvas.width,
+                this.canvas.height,
+            );
+
             if (this.initAnimationDone) this.refreshGsap();
         }
+
         this.resizeCommand.yes = false;
     };
 
@@ -503,6 +564,14 @@ class GOL {
             }
         }
 
+        // Rule Swap
+        if (this.nextRuleSwap <= Date.now()) {
+            this.nextRuleSwap = Date.now() + GOL_CONSTANTS.RuleSwapTimeSeconds;
+            const rule = choice(GOL_CONSTANTS.GolRules);
+            this.GolMaterial.uniforms.uBirthRules!.value = rule.birthRules;
+            this.GolMaterial.uniforms.uSurviveRules!.value = rule.surviveRules;
+        }
+
         if (this.initAnimationDone && this.resizeCommand.yes) {
             this.resize(this.resizeCommand.x, this.resizeCommand.y);
         }
@@ -538,7 +607,15 @@ class GOL {
                 this.pointer.pressDown ? 1 : 0,
             );
         } else {
-            this.GolMaterial.uniforms.uPointer!.value.set(-1, -1, 0);
+            if (Math.random() < GOL_CONSTANTS.GlobalChance) {
+                this.GolMaterial.uniforms.uPointer!.value.set(
+                    Math.floor(Math.random() * this.canvas.width),
+                    Math.floor(Math.random() * this.canvas.height),
+                    0,
+                );
+            } else {
+                this.GolMaterial.uniforms.uPointer!.value.set(-1, -1, 0);
+            }
         }
 
         for (let i = 0; i < this.squareSizes.length; i++) {
