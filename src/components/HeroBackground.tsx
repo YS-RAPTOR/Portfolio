@@ -2,8 +2,6 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import * as THREE from "three";
 
-// TODO: Style All of this better
-
 const ConvertColors = (colors: string[]) => {
     let str = "";
 
@@ -52,43 +50,41 @@ const ConvertGolRules = (rules: string, time: number) => {
     };
 };
 
-const GOL_CONSTANTS = {
-    SquareSize: 35,
-    InnerSize: 15,
-    HoverSize: 21,
-    MainHoverSize: 31,
-    HoverDrawRadius: 100,
-    PressedHoverDrawRadius: 125,
-
-    Timing: (1 / 30) * 1000,
-    GolRules: [ConvertGolRules("B2468/S012345678", 1)],
-    HoverGolRadius: 0.025,
-    PressedHoverGolRadius: 0.05,
-    GlobalChance: 0.01,
-    Colors: [
-        "#050505",
-        "#3730a3",
-        "#7e22ce",
-        "#c026d3",
-        "#c026d3",
-        "#ec4899",
-        "#e11d48",
-        "#fbbf24",
-        "#bef264",
-        "#fbbf24",
-        "#e11d48",
-        "#ec4899",
-        "#c026d3",
-        "#c026d3",
-        "#050505",
-        "#7e22ce",
-        "#3730a3",
-    ],
-};
-
 function choice<T>(array: T[]): T {
     return array[Math.floor(Math.random() * array.length)];
 }
+
+const GOL_CONSTANTS = {
+    SquareSize: 19,
+    InnerSize: 9,
+    HoverSize: 13,
+    MainHoverSize: 17,
+    HoverRadius: 1.5,
+    PressedHoverRadius: 2.5,
+    Timing: (1 / 30) * 1000,
+    GolRules: [ConvertGolRules("B3/S12345", 1)],
+    GlobalChance: 0.01,
+    Colors: [
+        "#09090b",
+        "#00bc7d",
+        "#00c950",
+        "#9ae600",
+        "#fdc700",
+        "#fe9a00",
+        "#ff6900",
+        "#e7000b",
+        "#ff2056",
+        "#f6339a",
+        "#e12afb",
+        "#9810fa",
+        "#7f22fe",
+        "#4f39f6",
+        "#155dfc",
+        "#00a6f4",
+        "#00d3f2",
+        "#00d5be",
+    ],
+};
 
 const VertSource = `
 varying vec2 vUvs;
@@ -137,7 +133,7 @@ int getNeighbours(vec2 pos){
 
 float getRandomColor(vec2 pos) {
     float random = getRandom(pos);
-    return clamp(floor(random * ${GOL_CONSTANTS.Colors.length}.0), 0.0, ${GOL_CONSTANTS.Colors.length - 1}.0);
+    return floor(random * ${GOL_CONSTANTS.Colors.length}.0);
 }
 
 void main() {
@@ -169,7 +165,9 @@ void main() {
         wrappDif *= aspect;
         
         float distanceFromPointer = length(wrappDif);
-        float dist = float(uPointer.z) * ${GOL_CONSTANTS.PressedHoverGolRadius} + float(1 - uPointer.z) * ${GOL_CONSTANTS.HoverGolRadius};
+
+        float dist = float(uPointer.z) * ${GOL_CONSTANTS.PressedHoverRadius} + float(1 - uPointer.z) * ${GOL_CONSTANTS.HoverRadius};
+        dist *= ${GOL_CONSTANTS.SquareSize}.0 / min(uCanvasResolution.x, uCanvasResolution.y);
 
         if(distanceFromPointer < dist){
             gl_FragColor.x = getRandomColor(vUvs);
@@ -307,7 +305,7 @@ class GOL {
 
         // All of the needed uniforms
 
-        const initialTexture = this.createTexture(0);
+        const initialTexture = this.createTexture();
         this.golScene = new THREE.Scene();
         this.drawScene = new THREE.Scene();
 
@@ -360,30 +358,11 @@ class GOL {
         this.renderer.setSize(this.canvas.width, this.canvas.height);
     }
 
-    createTexture = (n: number | "random") => {
+    createTexture = () => {
         const array = new Float32Array(
             this.numberHorizontally * this.numberVertically * 2,
         );
-
-        if (n === "random") {
-            for (let i = 0; i < array.length; i += 2) {
-                if (Math.random() < 0.5) {
-                    array[i] = Math.floor(
-                        Math.random() * GOL_CONSTANTS.Colors.length,
-                    );
-                    array[i + 1] = 1;
-                } else {
-                    array[i] = 0;
-                    array[i + 1] = 0;
-                }
-            }
-        } else {
-            const alive = n == 0 ? 0 : 1;
-            for (let i = 0; i < array.length; i += 2) {
-                array[i] = n;
-                array[i + 1] = alive;
-            }
-        }
+        array.fill(0);
 
         return new THREE.DataTexture(
             array,
@@ -461,13 +440,14 @@ class GOL {
                 this.numberVertically,
             );
 
-            const texture = this.createTexture("random");
+            const texture = this.createTexture();
             this.GolMaterial.uniforms.uTexture!.value = texture;
             this.drawMaterial.uniforms.uTexture!.value = texture.clone();
             this.GolMaterial.uniforms.uCanvasResolution!.value.set(
                 this.canvas.width,
                 this.canvas.height,
             );
+            this.GolMaterial.uniforms.uFrame!.value = 0;
 
             if (this.initAnimationDone) this.refreshGsap();
         }
@@ -518,8 +498,8 @@ class GOL {
         const mainIndex = mainX + mainY * this.numberHorizontally;
 
         const radius = this.pointer.pressDown
-            ? GOL_CONSTANTS.PressedHoverDrawRadius
-            : GOL_CONSTANTS.HoverDrawRadius;
+            ? GOL_CONSTANTS.PressedHoverRadius * GOL_CONSTANTS.SquareSize
+            : GOL_CONSTANTS.HoverRadius * GOL_CONSTANTS.SquareSize;
         const n = Math.floor(radius / GOL_CONSTANTS.SquareSize);
 
         for (let i = -n + mainX; i <= n + mainX; i++) {
@@ -706,9 +686,9 @@ export const HeroBackground = () => {
     return (
         <div
             ref={div}
-            className="relative flex h-fit min-h-[80vh] w-full items-center justify-center"
+            className="relative flex h-fit min-h-[80vh] w-full items-center justify-center overflow-clip"
         >
-            <canvas ref={canvas} className="absolute z-10"></canvas>
+            <canvas ref={canvas} className="absolute"></canvas>
         </div>
     );
 };
