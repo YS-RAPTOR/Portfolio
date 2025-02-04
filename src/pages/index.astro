@@ -3,14 +3,13 @@ import Base from "../layouts/Base.astro";
 import { Logo } from "../components/Logo.tsx";
 import { HeroBackground } from "../components/HeroBackground.tsx";
 import { Rewrite } from "../components/Rewrite.tsx";
-import { Test } from "../components/Test.tsx";
 ---
 
 <Base>
     <header class="flex w-full items-center justify-center border-b">
         <nav class="relative flex h-20 w-full justify-end border-x md:w-2/3">
             <div
-                class="absolute bottom-0 left-0 z-30 flex aspect-square h-20 w-20 translate-y-full items-center justify-center rounded-full border-2 bg-zinc-950 p-5 md:-translate-x-1/2 md:translate-y-1/2"
+                class="absolute bottom-0 left-0 z-30 flex aspect-square h-32 w-32 translate-y-full items-center justify-center rounded-full border-2 bg-zinc-950 p-8 md:-translate-x-1/2 md:translate-y-1/2"
             >
                 <Logo client:load />
             </div>
@@ -24,7 +23,7 @@ import { Test } from "../components/Test.tsx";
                 </a>
                 <a
                     href="#Contact"
-                    class="flex min-w-fit items-center justify-center rounded-[4rem] bg-teal-500 px-8 text-center text-base font-black text-zinc-950 transition-[border-radius] duration-200 ease-in-out hover:rounded-none xs:text-lg"
+                    class="flex min-w-fit items-center justify-center rounded-[4rem] bg-teal-400 px-8 text-center text-base font-black text-zinc-950 transition-[border-radius] duration-200 ease-in-out hover:rounded-none xs:text-lg"
                 >
                     Contact Me
                 </a>
@@ -33,9 +32,28 @@ import { Test } from "../components/Test.tsx";
     </header>
 
     <main id="Hero" class="flex h-fit justify-center border-b">
-        <div class="flex h-fit w-full justify-end border-x md:w-2/3">
+        <div
+            class="flex h-fit w-full items-center justify-center border-x md:w-2/3"
+        >
             <HeroBackground client:load />
-            <!-- <Test client:only /> -->
+            <div
+                class="absolute flex h-fit w-fit flex-col items-center justify-center border-2 bg-zinc-950 p-2"
+            >
+                <h1 class="text-7xl">Hello, I'm Yashan</h1>
+                <h1 class="bg-slate-p-1 text-5xl font-light">
+                    [<Rewrite
+                        titles={[
+                            "Mechatronics Engineer",
+                            "Software Engineer....",
+                            "Robotics Engineer....",
+                            "Mechanical Engineer..",
+                            "Electrical Engineer..",
+                        ]}
+                        inbetween="....................."
+                        client:load
+                    />]
+                </h1>
+            </div>
         </div>
     </main>
     <section id="Projects">

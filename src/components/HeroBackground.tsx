@@ -62,7 +62,114 @@ const GOL_CONSTANTS = {
     HoverRadius: 1.5,
     PressedHoverRadius: 2.5,
     Timing: (1 / 30) * 1000,
-    GolRules: [ConvertGolRules("B3/S12345", 1)],
+    GolRules: [
+        // Decays
+        ConvertGolRules("B017/S01", 10),
+        ConvertGolRules("B2/S", 10),
+        ConvertGolRules("B234/S", 10),
+        ConvertGolRules("B3/S0248", 10),
+        ConvertGolRules("B3/S12", 10),
+        ConvertGolRules("B3/S128", 10),
+        ConvertGolRules("B3/S13", 10),
+        ConvertGolRules("B3/S2", 10),
+        ConvertGolRules("B3/S4567", 10),
+        ConvertGolRules("B3/S45678", 10),
+        ConvertGolRules("B345/S2", 10),
+        ConvertGolRules("B3567/S15678", 10),
+        ConvertGolRules("B35678/S4678", 10),
+        ConvertGolRules("B35678/S5678", 10),
+        ConvertGolRules("B3578/S24678", 10),
+        ConvertGolRules("B36/S12", 10),
+        ConvertGolRules("B36/S128", 10),
+        ConvertGolRules("B36/S245", 10),
+        ConvertGolRules("B368/S128", 10),
+        ConvertGolRules("B368/S245", 10),
+        ConvertGolRules("B37/S12", 10),
+        ConvertGolRules("B38/S12", 10),
+        ConvertGolRules("B38/S128", 10),
+        ConvertGolRules("B45/S1235", 10),
+        ConvertGolRules("B45678/S5678", 10),
+        ConvertGolRules("B4678/S35678", 10),
+        ConvertGolRules("B48/S234", 10),
+        ConvertGolRules("B56/S14568", 10),
+        ConvertGolRules("B5678/S45678", 10),
+
+        // Stable
+        ConvertGolRules("B014/S2", 20),
+        ConvertGolRules("B026/S1", 20),
+        ConvertGolRules("B08/S4", 20),
+        ConvertGolRules("B1/S014567", 20),
+        ConvertGolRules("B1/S1", 20),
+        ConvertGolRules("B12678/S15678", 20),
+        ConvertGolRules("B1357/S1357", 20),
+        ConvertGolRules("B1357/S02468", 20),
+        ConvertGolRules("B1358/S0247", 20),
+        ConvertGolRules("B2/S0", 20),
+        ConvertGolRules("B2/S13", 20),
+        ConvertGolRules("B25/S4", 20),
+        ConvertGolRules("B3/S023", 20),
+        ConvertGolRules("B3/S123678", 20),
+        ConvertGolRules("B3/S1237", 20),
+        ConvertGolRules("B3/S124", 20),
+        ConvertGolRules("B3/S23", 20),
+        ConvertGolRules("B3/S2378", 20),
+        ConvertGolRules("B3/S238", 20),
+        ConvertGolRules("B3/S245678", 20),
+        ConvertGolRules("B34/S34", 20),
+        ConvertGolRules("B34/S35", 20),
+        ConvertGolRules("B35/S23", 20),
+        ConvertGolRules("B35/S236", 20),
+        ConvertGolRules("B357/S1358", 20),
+        ConvertGolRules("B357/S238", 20),
+        ConvertGolRules("B36/S125", 20),
+        ConvertGolRules("B36/S23", 20),
+        ConvertGolRules("B36/S235", 20),
+        ConvertGolRules("B36/S238", 20),
+        ConvertGolRules("B367/S125678", 20),
+        ConvertGolRules("B367/S23", 20),
+        ConvertGolRules("B3678/S1258", 20),
+        ConvertGolRules("B3678/S135678", 20),
+        ConvertGolRules("B3678/S23", 20),
+        ConvertGolRules("B3678/S34678", 20),
+        ConvertGolRules("B368/S12578", 20),
+        ConvertGolRules("B368/S236", 20),
+        ConvertGolRules("B368/S238", 20),
+        ConvertGolRules("B37/S23", 20),
+        ConvertGolRules("B38/S23", 20),
+        ConvertGolRules("B38/S238", 20),
+        ConvertGolRules("B45678/S2345", 20),
+
+        // Explodes
+        ConvertGolRules("B0123478/S01234678", 8),
+        ConvertGolRules("B0123478/S34678", 8),
+        ConvertGolRules("B01356/S012345", 8),
+        ConvertGolRules("B028/S0124", 8),
+        ConvertGolRules("B1/S012345678", 8),
+        ConvertGolRules("B1/S134567", 8),
+        ConvertGolRules("B2/S2345", 8),
+        ConvertGolRules("B2/S23456", 8),
+        ConvertGolRules("B3/S012345678", 8),
+        ConvertGolRules("B3/S1234", 8),
+        ConvertGolRules("B3/S12345", 8),
+        ConvertGolRules("B34/S456", 8),
+        ConvertGolRules("B345/S0456", 8),
+        ConvertGolRules("B345/S4567", 8),
+        ConvertGolRules("B34568/S15678", 8),
+        ConvertGolRules("B3457/S4568", 8),
+        ConvertGolRules("B34578/S456", 8),
+        ConvertGolRules("B35/S234578", 8),
+        ConvertGolRules("B35678/S34567", 8),
+        ConvertGolRules("B36/S234578", 8),
+        ConvertGolRules("B3678/S235678", 8),
+        ConvertGolRules("B37/S012345678", 8),
+        ConvertGolRules("B37/S1234", 8),
+        ConvertGolRules("B37/S12345", 8),
+        ConvertGolRules("B378/S012345678", 8),
+        ConvertGolRules("B378/S235678", 8),
+        ConvertGolRules("B38/S012345678", 8),
+        ConvertGolRules("B45/S12345", 8),
+    ],
+    InitialColor: -1,
     GlobalChance: 0.01,
     Colors: [
         "#09090b",
@@ -176,9 +283,18 @@ void main() {
     }
 
     if(uFrame == 0){
-        gl_FragColor.x = getRandomColor(vUvs);
+        if(${GOL_CONSTANTS.InitialColor} == -1){
+            gl_FragColor.x = getRandomColor(vUvs);
+        }else{
+            gl_FragColor.x = float(${GOL_CONSTANTS.InitialColor});
+        }
+        
+        if(gl_FragColor.x == 0.0) {
+            gl_FragColor.y = 0.0;
+        }
     };
 
+    gl_FragColor.y = clamp(gl_FragColor.y, 0.0, 1.0);
     gl_FragColor.x = clamp(gl_FragColor.x, 0.0, ${GOL_CONSTANTS.Colors.length - 1}.0);
 }
 `;
@@ -587,7 +703,7 @@ class GOL {
                 this.pointer.y,
                 this.pointer.pressDown ? 1 : 0,
             );
-        } else {
+        } else if (this.initAnimationDone) {
             if (Math.random() < GOL_CONSTANTS.GlobalChance) {
                 this.GolMaterial.uniforms.uPointer!.value.set(
                     Math.floor(Math.random() * this.canvas.width),
