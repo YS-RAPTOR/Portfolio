@@ -2,21 +2,19 @@
 import Base from "../layouts/Base.astro";
 import { Logo } from "../components/Logo.tsx";
 import { HeroBackground } from "../components/HeroBackground.tsx";
-import { Rewrite } from "../components/Rewrite.tsx";
+import { HeroHeader } from "../components/HeroHeader.tsx";
 import { Projects } from "../components/Projects.tsx";
+import { ProjectsHeader } from "../components/ProjectsHeader.tsx";
+import { Test } from "../components/Test.tsx";
 ---
 
 <Base>
+    <Test client:load />
     <header class="flex w-full items-center justify-center border-b">
         <nav
             class="relative flex h-20 w-full justify-between border-x md:w-2/3"
         >
-            <div
-                class="flex aspect-square h-20 w-20 items-center justify-center rounded-full border-2 bg-zinc-950 p-5"
-            >
-                <Logo client:load />
-            </div>
-
+            <Logo client:load />
             <div class="flex min-w-fit">
                 <a
                     href="/Portfolio/resume"
@@ -36,41 +34,17 @@ import { Projects } from "../components/Projects.tsx";
 
     <main id="Hero" class="flex h-fit justify-center border-b">
         <div
-            class="flex h-fit w-full items-center justify-center border-x md:w-2/3"
+            class="relative flex h-fit w-full items-center justify-center border-x md:w-2/3"
         >
             <HeroBackground client:load />
-            <div
-                class="absolute flex h-fit w-fit flex-col items-center justify-center border-2 bg-zinc-950 p-2"
-            >
-                <h1 class="text-lg sm:text-2xl md:text-5xl lg:text-7xl">
-                    Lorem Ipsum
-                </h1>
-                <h1
-                    class="bg-slate-p-1 text-sm font-light sm:text-xl md:text-3xl lg:text-5xl"
-                >
-                    [<Rewrite
-                        titles={[
-                            "Mechatronics Engineer",
-                            "Software Engineer....",
-                            "Robotics Engineer....",
-                            "Mechanical Engineer..",
-                            "Electrical Engineer..",
-                        ]}
-                        inbetween="....................."
-                        client:load
-                    />]
-                </h1>
+            <div class="absolute flex flex-col border-2 bg-zinc-950">
+                <HeroHeader client:load />
             </div>
         </div>
     </main>
     <section id="Projects" class="flex h-fit flex-col items-center border-b">
-        <div
-            class="flex h-fit w-full items-center justify-center border-x p-8 md:w-2/3"
-        >
-            <h1 class="text-lg font-extralight lg:text-2xl">PROJECTS</h1>
-        </div>
-        <div class="w-full border-b"></div>
-        <Projects client:load />
+        <ProjectsHeader client:load />
+        <!-- <Projects client:load /> -->
     </section>
     <section id="About">
         <h1>About Me</h1>
