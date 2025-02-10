@@ -243,6 +243,12 @@ float getRandomColor(vec2 pos) {
     return floor(random * ${GOL_CONSTANTS.Colors.length}.0);
 }
 
+float getRandomColorHover(vec2 pos) {
+    vec2 nudge = vec2(uFrame/15) + vec2(uPointer.xy) / uCanvasResolution + uResolution;
+    float random = abs(fract(sin(dot(pos + nudge, vec2(12.9898, 78.233))) * 43758.5453));
+    return floor(random * ${GOL_CONSTANTS.Colors.length}.0);
+}
+
 void main() {
     gl_FragColor = texture2D(uTexture, vUvs);
 
@@ -277,7 +283,7 @@ void main() {
         dist *= ${GOL_CONSTANTS.SquareSize}.0 / min(uCanvasResolution.x, uCanvasResolution.y);
 
         if(distanceFromPointer < dist){
-            gl_FragColor.x = getRandomColor(vUvs);
+            gl_FragColor.x = getRandomColorHover(vUvs);
             gl_FragColor.y = 1.0;
         }
     }
@@ -376,6 +382,7 @@ class GOL {
                     size: 0,
                 },
                 {
+                    delay: 2,
                     ease: "power1.inOut",
                     size: GOL_CONSTANTS.InnerSize,
                     duration: 1,
@@ -433,7 +440,7 @@ class GOL {
             fragmentShader: DrawSource,
         });
 
-        const rule = choice(GOL_CONSTANTS.GolRules);
+        const rule = ConvertGolRules("B3/S23", 20);
         this.nextRuleSwap = Date.now() + rule.time;
         this.GolMaterial = new THREE.ShaderMaterial({
             uniforms: {
