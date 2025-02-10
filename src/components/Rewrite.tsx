@@ -34,7 +34,7 @@ export const Rewrite = (props: {
                 "+=0.1",
             );
         }
-    });
+    }, [props.titles]);
 
     return (
         <span className={props.className} ref={ref}>
