@@ -1,0 +1,24 @@
+{
+    "title": "Pick & Place Robot",
+    "description": "TODO",
+    "image": "assets/TODO.jpg",
+    "fields": [
+        "mechatronics",
+        "software",
+        "robotics",
+        "mechanical",
+        "electrical"
+    ],
+    "tech": [
+        "solidworks",
+        "laser cutter",
+        "3d printing",
+        "ni",
+        "labview",
+        "matlab",
+        "pid"
+    ],
+    "done": true,
+    "demo": "https://www.youtube.com/watch?v=bwQdo1WK1JE",
+    "github": "https://github.com/YS-RAPTOR/Pick-Place-Robot"
+}

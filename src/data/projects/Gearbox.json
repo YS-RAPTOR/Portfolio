@@ -3,7 +3,7 @@
     "description": "TODO",
     "image": "assets/TODO.jpg",
     "fields": ["mechatronics", "mechanical"],
-    "tech": ["solidworks", "Laser Cutter"],
+    "tech": ["solidworks", "laser cutter"],
     "done": true,
     "demo": "TODO"
 }
