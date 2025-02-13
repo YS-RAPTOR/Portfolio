@@ -1,20 +1,19 @@
 import { Rewrite } from "./Rewrite";
 import { FaLocationDot } from "react-icons/fa6";
-import { useStore } from "../utils/store.ts";
+import { useStore, noOfSelected } from "../utils/store.ts";
 import { getTitles } from "../utils/lib.ts";
 import { useEffect, useState } from "react";
 
 export const HeroHeader = () => {
     const selected = useStore((s) => s.selected);
-    const noOfSelected = useStore((s) => s.noOfSelected);
     const [titles, setTitles] = useState(selected.map((s) => getTitles(s.job)));
     const [updated, setUpdated] = useState(false);
 
     useEffect(() => {
         if (updated) return;
-        if (noOfSelected() === 0) return;
+        if (noOfSelected(selected) === 0) return;
 
-        setTitles(useStore.getState().selected.map((s) => getTitles(s.job)));
+        setTitles(selected.map((s) => getTitles(s.job)));
         setUpdated(true);
     }, [selected]);
 

@@ -13,7 +13,6 @@ interface Store {
 
     initializeState: () => void;
     updateSelected: (s: SelectionState[]) => void;
-    noOfSelected: () => number;
     toggleSelected: (job: number) => void;
 }
 
@@ -73,7 +72,10 @@ export const useStore = create<Store>()((set, get) => ({
     toggleSelected: (jobIndex: number) => {
         const newSelected = structuredClone(get().selected);
 
-        if (newSelected[jobIndex].selected && get().noOfSelected() === 1) {
+        if (
+            newSelected[jobIndex].selected &&
+            noOfSelected(get().selected) === 1
+        ) {
             alert("Must have at least one selected");
             return;
         }
@@ -110,14 +112,12 @@ export const useStore = create<Store>()((set, get) => ({
         }
         get().updateSelected(newSelected);
     },
-
-    noOfSelected: () => {
-        const selected = get().selected;
-
-        let noSelected = 0;
-        for (let i = 0; i < selected.length; i++) {
-            if (selected[i].selected) noSelected++;
-        }
-        return noSelected;
-    },
 }));
+
+export const noOfSelected = (selected: SelectionState[]) => {
+    let noSelected = 0;
+    for (let i = 0; i < selected.length; i++) {
+        if (selected[i].selected) noSelected++;
+    }
+    return noSelected;
+};
