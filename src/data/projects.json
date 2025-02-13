@@ -1,0 +1,18 @@
+{
+    "title": "Title",
+    "description": "Dexcription",
+    "image": "assets/Placeholder.jpg",
+    "fields": [
+        "mechatronics",
+        "fullstack",
+        "software",
+        "robotics",
+        "mechanical",
+        "electrical"
+    ],
+    "tech": ["typescript", "solidworks", "c++", "arduino"],
+    "done": false,
+    "demo": "www.example.com",
+    "github": "www.github.com",
+    "blog": "www.blog.com"
+}

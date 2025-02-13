@@ -22,24 +22,26 @@ export const useStore = create<Store>()((set, get) => ({
     prevSelected: jobTypes.map((j) => ({ selected: false, job: j })),
 
     initializeState: () => {
-        set((s) => {
-            const selected = getSelectedJobs() ?? jobTypes;
-            const newSelected = structuredClone(s.selected);
+        const selected = getSelectedJobs() ?? jobTypes;
+        const newSelected: SelectionState[] = [];
 
-            for (let i = 0; i < newSelected.length; i++) {
-                if (selected.includes(newSelected[i].job)) {
-                    newSelected[i].selected = true;
-                }
-            }
-            newSelected.sort((a, b) => {
-                return a.selected === b.selected ? 0 : a.selected ? -1 : 1;
+        for (let i = 0; i < selected.length; i++) {
+            newSelected.push({
+                selected: true,
+                job: selected[i],
             });
+        }
 
-            return {
-                selected: newSelected,
-                prevSelected: s.selected,
-            };
-        });
+        for (let i = 0; i < jobTypes.length; i++) {
+            if (!selected.includes(jobTypes[i])) {
+                newSelected.push({
+                    job: jobTypes[i],
+                    selected: false,
+                });
+            }
+        }
+
+        get().updateSelected(newSelected);
     },
 
     updateSelected: (selected: SelectionState[]) => {

@@ -1,0 +1,17 @@
+{
+    "title": "Routing Agents",
+    "description": "TODO",
+    "image": "assets/TODO.jpg",
+    "fields": ["fullstack", "software"],
+    "tech": [
+        "typescript",
+        "react",
+        "react three fiber",
+        "zig",
+        "python",
+        "fastapi"
+    ],
+    "done": false,
+    "demo": "TODO",
+    "github": "https://github.com/YS-RAPTOR/Routing-Algorithms"
+}

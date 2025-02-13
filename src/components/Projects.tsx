@@ -1,6 +1,7 @@
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useEffect, useRef } from "react";
+import { Image } from "astro:assets";
 
 const projects: {
     name: string;
@@ -76,5 +77,9 @@ export const Projects = () => {
     // Setp 4 - Get flip state
     // Step 5 - Update state
 
+    return <div className=""></div>;
+};
+
+const ProjectView = () => {
     return <div></div>;
 };

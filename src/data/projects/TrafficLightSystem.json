@@ -1,0 +1,10 @@
+{
+    "title": "Traffic Light System",
+    "description": "TODO",
+    "image": "assets/TODO.jpg",
+    "fields": ["mechatronics", "software", "electrical"],
+    "tech": ["vhdl", "cpld", "xilinx ise"],
+    "done": true,
+    "github": "https://github.com/YS-RAPTOR/TrafficLightProject",
+    "demo": "TODO"
+}

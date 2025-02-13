@@ -1,0 +1,10 @@
+{
+    "title": "Caffe Loyalty Program",
+    "description": "TODO",
+    "image": "assets/TODO.jpg",
+    "fields": ["fullstack", "software"],
+    "tech": ["typescript", "expo", "react native"],
+    "done": true,
+    "demo": "TODO",
+    "github": "https://github.com/YS-RAPTOR/Loyalty"
+}

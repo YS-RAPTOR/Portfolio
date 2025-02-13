@@ -1,0 +1,19 @@
+{
+    "title": "Theme Journal App",
+    "description": "TODO",
+    "image": "assets/TODO.jpg",
+    "fields": ["fullstack", "software"],
+    "tech": [
+        "typescript",
+        "c#",
+        "dotnet",
+        "react",
+        "tailwind",
+        "tanstack query",
+        "azure",
+        "cloudflare"
+    ],
+    "done": true,
+    "demo": "https://theme-journal.pages.dev/",
+    "github": "https://github.com/YS-RAPTOR/Theme-Journal"
+}

@@ -1,0 +1,10 @@
+{
+    "title": "Arduino BODMAS Calculator",
+    "description": "TODO",
+    "image": "assets/TODO.jpg",
+    "done": true,
+    "tech": ["arduino", "c++"],
+    "fields": ["software", "robotics", "mechatronics"],
+    "demo": "https://wokwi.com/projects/346662749691970131",
+    "github": "https://github.com/YS-RAPTOR/Arduino-Calculator"
+}

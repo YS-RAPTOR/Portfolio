@@ -1,0 +1,10 @@
+{
+    "title": "Tetris Solver",
+    "description": "TODO",
+    "image": "assets/TODO.jpg",
+    "fields": ["software"],
+    "tech": ["matlab", "java", "tesseract ocr"],
+    "done": true,
+    "demo": "https://www.youtube.com/watch?v=fYfdHKImXKY",
+    "github": "https://github.com/YS-RAPTOR/Tetris-AI"
+}

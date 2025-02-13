@@ -1,0 +1,9 @@
+{
+    "title": "Gearbox",
+    "description": "TODO",
+    "image": "assets/TODO.jpg",
+    "fields": ["mechatronics", "mechanical"],
+    "tech": ["solidworks", "Laser Cutter"],
+    "done": true,
+    "demo": "TODO"
+}

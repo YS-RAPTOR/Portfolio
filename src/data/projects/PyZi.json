@@ -1,0 +1,10 @@
+{
+    "title": "PyZi",
+    "description": "TODO",
+    "image": "assets/TODO.jpg",
+    "fields": ["fullstack", "software"],
+    "tech": ["zig", "python"],
+    "done": false,
+    "github": "https://github.com/YS-RAPTOR/PyZi",
+    "blog": "TODO"
+}

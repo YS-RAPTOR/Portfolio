@@ -44,3 +44,11 @@ export const getJobColor = (job: JobType) => {
     else if (job === "mechanical") return "purple-500";
     else if (job === "electrical") return "teal-500";
 };
+
+export const technologies = [
+    "typescript",
+    "solidworks",
+    "c++",
+    "arduino",
+] as const;
+export type Technology = (typeof technologies)[number];
