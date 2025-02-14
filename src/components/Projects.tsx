@@ -36,7 +36,7 @@ const ProjectView = (props: { project?: ProjectType }) => {
     }
 
     return (
-        <div className="aspect-square w-full bg-zinc-950 text-xs outline outline-1 outline-zinc-50 lg:text-base">
+        <div className="aspect-square w-full text-xs outline outline-1 outline-zinc-50 lg:text-base">
             <div className="h-2/3 w-full border-b bg-green-950"></div>
             <div className="flex w-full items-center justify-between border-b">
                 <h1 className="p-1 font-bold">{props.project.title}</h1>
@@ -44,18 +44,20 @@ const ProjectView = (props: { project?: ProjectType }) => {
                     {props.project.github && (
                         <a
                             href={props.project.github}
-                            className="aspect-square h-full cursor-pointer border-l p-2"
+                            className="group relative aspect-square h-full cursor-pointer overflow-clip border-l p-2"
                         >
-                            <FaGithub />
+                            <div className="absolute inset-1 -z-10 scale-0 rounded-full bg-zinc-50 transition-transform duration-200 ease-in-out group-hover:scale-150" />
+                            <FaGithub className="mix-blend-difference" />
                         </a>
                     )}
 
                     {props.project.demo && (
                         <a
                             href={props.project.demo}
-                            className="aspect-square h-full cursor-pointer border-l p-2"
+                            className="group relative aspect-square h-full cursor-pointer overflow-clip border-l p-2"
                         >
-                            <FaArrowUpRightFromSquare />
+                            <div className="absolute inset-1 -z-10 scale-0 rounded-full bg-zinc-50 transition-transform duration-200 ease-in-out group-hover:scale-150" />
+                            <FaArrowUpRightFromSquare className="mix-blend-difference" />
                         </a>
                     )}
                 </div>
