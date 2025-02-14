@@ -5,6 +5,6 @@
     "fields": ["mechatronics", "software", "robotics"],
     "tech": ["c++", "opencv", "abb", "rapid"],
     "done": true,
-    "demo": "https://www.youtube.com/watch?v=WHHzf1fmyfo",
+    "link": "https://www.youtube.com/watch?v=WHHzf1fmyfo",
     "github": "https://github.com/YS-RAPTOR/Tic-Tac-Toe-Robot"
 }

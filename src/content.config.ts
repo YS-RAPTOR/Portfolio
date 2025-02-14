@@ -13,9 +13,8 @@ const projects = defineCollection({
         fields: z.array(z.enum(jobTypes)),
         tech: z.array(z.enum(technologies)),
         done: z.boolean(),
-        demo: z.optional(z.string()),
+        link: z.optional(z.string()),
         github: z.optional(z.string()),
-        blog: z.optional(z.string()),
     }),
 });
 

@@ -5,6 +5,6 @@
     "fields": ["fullstack", "software"],
     "tech": ["typescript", "expo", "react native"],
     "done": true,
-    "demo": "TODO",
+    "link": "TODO",
     "github": "https://github.com/YS-RAPTOR/Loyalty"
 }

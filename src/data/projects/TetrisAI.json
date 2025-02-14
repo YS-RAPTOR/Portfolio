@@ -5,6 +5,6 @@
     "fields": ["software"],
     "tech": ["matlab", "java", "tesseract ocr"],
     "done": true,
-    "demo": "https://www.youtube.com/watch?v=fYfdHKImXKY",
+    "link": "https://www.youtube.com/watch?v=fYfdHKImXKY",
     "github": "https://github.com/YS-RAPTOR/Tetris-AI"
 }

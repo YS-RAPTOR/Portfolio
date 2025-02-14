@@ -39,7 +39,7 @@ const ProjectView = (props: { project?: ProjectType }) => {
         <div className="aspect-square w-full text-xs outline outline-1 outline-zinc-50 lg:text-base">
             <div className="h-2/3 w-full border-b bg-green-950"></div>
             <div className="flex w-full items-center justify-between border-b">
-                <h1 className="p-1 font-bold">{props.project.title}</h1>
+                <h1 className="px-2 py-1 font-bold">{props.project.title}</h1>
                 <div className="flex">
                     {props.project.github && (
                         <a
@@ -51,9 +51,9 @@ const ProjectView = (props: { project?: ProjectType }) => {
                         </a>
                     )}
 
-                    {props.project.demo && (
+                    {props.project.link && (
                         <a
-                            href={props.project.demo}
+                            href={props.project.link}
                             className="group relative aspect-square h-full cursor-pointer overflow-clip border-l p-2"
                         >
                             <div className="absolute inset-1 -z-10 scale-0 rounded-full bg-zinc-50 transition-transform duration-200 ease-in-out group-hover:scale-150" />
@@ -62,6 +62,7 @@ const ProjectView = (props: { project?: ProjectType }) => {
                     )}
                 </div>
             </div>
+            <p className="px-2">{props.project.description}</p>
         </div>
     );
 };

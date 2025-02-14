@@ -5,5 +5,5 @@
     "fields": ["mechatronics", "mechanical"],
     "tech": ["solidworks", "laser cutter"],
     "done": true,
-    "demo": "TODO"
+    "link": "TODO"
 }
