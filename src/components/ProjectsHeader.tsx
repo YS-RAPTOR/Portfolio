@@ -68,9 +68,12 @@ export const ProjectsHeader = () => {
             <h1 className="p-2 text-lg font-extralight md:p-4 lg:p-6 lg:text-2xl">
                 PROJECTS
             </h1>
-            <div ref={ref} className="flex flex-wrap items-end justify-center">
+            <div
+                ref={ref}
+                className="flex flex-wrap items-end justify-center gap-1 p-1"
+            >
                 <div
-                    className="relative w-32 cursor-pointer text-center text-sm capitalize"
+                    className="relative w-32 cursor-pointer overflow-clip border text-center text-sm capitalize"
                     onClick={() => {
                         if (noOfSelected(state) === state.length) {
                             updateState(
@@ -88,7 +91,7 @@ export const ProjectsHeader = () => {
                             "w-full transition-colors duration-200 ease-in-out " +
                             (noOfSelected(state) === state.length
                                 ? "bg-zinc-50 text-zinc-950 hover:bg-zinc-400 hover:text-zinc-50"
-                                : "bg-zinc-950 text-zinc-50 underline hover:bg-zinc-400 hover:text-zinc-950")
+                                : "bg-zinc-950 text-zinc-50 hover:bg-zinc-400 hover:text-zinc-950")
                         }
                     >
                         All
@@ -118,14 +121,14 @@ const Selector = (props: {
 }) => {
     const stateClasses = props.state.selected
         ? `bg-${getJobColor(props.state.job)} hover:bg-zinc-400`
-        : `hover:bg-${getJobColor(props.state.job)} underline`;
+        : `hover:bg-${getJobColor(props.state.job)}`;
     const prevStateClasses = props.prevState.selected
         ? `bg-${getJobColor(props.prevState.job)}`
-        : "underline";
+        : "";
 
     return (
         <div
-            className="swap relative w-32 cursor-pointer text-center text-sm capitalize"
+            className="swap relative w-32 cursor-pointer overflow-clip border text-center text-sm capitalize"
             onClick={props.onClick}
         >
             <div className={`swap-top w-full ${prevStateClasses}`}>
