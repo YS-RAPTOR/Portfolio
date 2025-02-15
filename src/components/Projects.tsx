@@ -5,6 +5,7 @@ import { Image } from "astro:assets";
 import type { CollectionEntry } from "astro:content";
 import { FaGithub } from "react-icons/fa";
 import { FaArrowUpRightFromSquare } from "react-icons/fa6";
+import { TechName } from "./Tech";
 
 type ProjectType = CollectionEntry<"projects">["data"];
 
@@ -36,33 +37,41 @@ const ProjectView = (props: { project?: ProjectType }) => {
     }
 
     return (
-        <div className="aspect-square w-full text-xs outline outline-1 outline-zinc-50 lg:text-base">
-            <div className="h-2/3 w-full border-b bg-green-950"></div>
-            <div className="flex w-full items-center justify-between border-b">
-                <h1 className="px-2 py-1 font-bold">{props.project.title}</h1>
-                <div className="flex">
-                    {props.project.github && (
-                        <a
-                            href={props.project.github}
-                            className="group relative aspect-square h-full cursor-pointer overflow-clip border-l p-2"
-                        >
-                            <div className="absolute inset-1 -z-10 scale-0 rounded-full bg-zinc-50 transition-transform duration-200 ease-in-out group-hover:scale-150" />
-                            <FaGithub className="mix-blend-difference" />
-                        </a>
-                    )}
-
-                    {props.project.link && (
-                        <a
-                            href={props.project.link}
-                            className="group relative aspect-square h-full cursor-pointer overflow-clip border-l p-2"
-                        >
-                            <div className="absolute inset-1 -z-10 scale-0 rounded-full bg-zinc-50 transition-transform duration-200 ease-in-out group-hover:scale-150" />
-                            <FaArrowUpRightFromSquare className="mix-blend-difference" />
-                        </a>
-                    )}
+        <div className="flex aspect-square h-full w-full flex-col justify-between bg-zinc-950 text-xs outline outline-1 outline-zinc-50 lg:text-base">
+            <div>
+                <div className="aspect-[1.5] w-full border-b"></div>
+                <div className="flex w-full items-center justify-between border-b">
+                    <h1 className="px-2 py-1 font-bold">
+                        {props.project.title}
+                    </h1>
+                    <div className="flex">
+                        {props.project.github && (
+                            <a
+                                href={props.project.github}
+                                className="group relative aspect-square h-full cursor-pointer overflow-clip border-l p-2"
+                            >
+                                <div className="absolute inset-1 scale-0 rounded-full bg-zinc-50 transition-transform duration-200 ease-in-out group-hover:scale-150" />
+                                <FaGithub className="mix-blend-difference" />
+                            </a>
+                        )}
+                        {props.project.link && (
+                            <a
+                                href={props.project.link}
+                                className="group relative aspect-square h-full cursor-pointer overflow-clip border-l p-2"
+                            >
+                                <div className="absolute inset-1 scale-0 rounded-full bg-zinc-50 transition-transform duration-200 ease-in-out group-hover:scale-150" />
+                                <FaArrowUpRightFromSquare className="mix-blend-difference" />
+                            </a>
+                        )}
+                    </div>
                 </div>
+                <p className="px-2">{props.project.description}</p>
             </div>
-            <p className="px-2">{props.project.description}</p>
+            <div className="flex flex-wrap gap-1 p-1">
+                {props.project.tech.map((tech, index) => (
+                    <TechName key={tech} tech={tech} />
+                ))}
+            </div>
         </div>
     );
 };
