@@ -20,7 +20,7 @@ export const Projects = (props: { projects: ProjectType[] }) => {
     // Step 5 - Update state
 
     return (
-        <div className="grid h-fit w-full grid-cols-1 px-[0.75px] sm:grid-cols-2 md:w-2/3">
+        <div className="grid w-full grid-cols-1 px-[0.75px] sm:grid-cols-2 md:w-2/3">
             {props.projects.map((project, index) => (
                 <ProjectView key={index} project={project} />
             ))}
@@ -37,10 +37,10 @@ const ProjectView = (props: { project?: ProjectType }) => {
     }
 
     return (
-        <div className="flex aspect-square h-full w-full flex-col justify-between bg-zinc-950 text-xs outline outline-1 outline-zinc-50 lg:text-base">
+        <div className="flex h-full w-full flex-col justify-between bg-zinc-950 text-sm outline outline-1 outline-zinc-50 lg:text-base">
             <div>
                 <div className="aspect-[1.5] w-full border-b"></div>
-                <div className="flex w-full items-center justify-between border-b">
+                <div className="flex w-full justify-between border-b">
                     <h1 className="px-2 py-1 font-bold">
                         {props.project.title}
                     </h1>
@@ -48,7 +48,7 @@ const ProjectView = (props: { project?: ProjectType }) => {
                         {props.project.github && (
                             <a
                                 href={props.project.github}
-                                className="group relative aspect-square h-full cursor-pointer overflow-clip border-l p-2"
+                                className="group relative flex h-full cursor-pointer items-center overflow-clip border-l p-2"
                             >
                                 <div className="absolute inset-1 scale-0 rounded-full bg-zinc-50 transition-transform duration-200 ease-in-out group-hover:scale-150" />
                                 <FaGithub className="mix-blend-difference" />
@@ -57,7 +57,7 @@ const ProjectView = (props: { project?: ProjectType }) => {
                         {props.project.link && (
                             <a
                                 href={props.project.link}
-                                className="group relative aspect-square h-full cursor-pointer overflow-clip border-l p-2"
+                                className="group relative flex h-full cursor-pointer items-center overflow-clip border-l p-2"
                             >
                                 <div className="absolute inset-1 scale-0 rounded-full bg-zinc-50 transition-transform duration-200 ease-in-out group-hover:scale-150" />
                                 <FaArrowUpRightFromSquare className="mix-blend-difference" />
@@ -65,9 +65,9 @@ const ProjectView = (props: { project?: ProjectType }) => {
                         )}
                     </div>
                 </div>
-                <p className="px-2">{props.project.description}</p>
+                <p className="px-1">{props.project.description}</p>
             </div>
-            <div className="flex flex-wrap gap-1 p-1">
+            <div className="flex flex-wrap gap-1 p-1 text-xs font-light lg:text-sm">
                 {props.project.tech.map((tech, index) => (
                     <TechName key={tech} tech={tech} />
                 ))}
