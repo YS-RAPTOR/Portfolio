@@ -1,7 +1,7 @@
-import { type Technology } from "../utils/lib.ts";
+import { type Technology, getTechName } from "../utils/lib.ts";
 
 export const TechName = (props: { tech: Technology }) => {
-    return <div className="border px-2 py-1">{props.tech}</div>;
+    return <div className="border px-1 py-0.5">{getTechName(props.tech)}</div>;
 };
 
 export const TechWithLogo = () => {

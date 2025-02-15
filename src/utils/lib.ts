@@ -8,6 +8,10 @@ export const jobTypes = [
 ] as const;
 export type JobType = (typeof jobTypes)[number];
 
+const assetUnreachable = (x: never): never => {
+    throw new Error(`Unreachable: ${x}`);
+};
+
 export const getTitles = (jobs: JobType) => {
     if (jobs === "mechatronics") return "Mechatronics Engineer";
     else if (jobs === "fullstack") return "Fullstack Developer..";
@@ -15,7 +19,7 @@ export const getTitles = (jobs: JobType) => {
     else if (jobs === "robotics") return "Robotics Engineer....";
     else if (jobs === "mechanical") return "Mechanical Engineer..";
     else if (jobs === "electrical") return "Electrical Engineer..";
-    else throw "Undefined Job Type";
+    assetUnreachable(jobs);
 };
 
 export const getSelectedJobs = (): JobType[] | null => {
@@ -80,3 +84,39 @@ export const technologies = [
 ] as const;
 
 export type Technology = (typeof technologies)[number];
+
+export const getTechName = (tech: Technology) => {
+    if (tech === "typescript") return "TypeScript";
+    else if (tech === "solidworks") return "SolidWorks";
+    else if (tech === "arduino") return "Arduino";
+    else if (tech === "laser cutter") return "Laser Cutter";
+    else if (tech === "3d printing") return "3D Printing";
+    else if (tech === "ni") return "NI";
+    else if (tech === "labview") return "LabView";
+    else if (tech === "pid") return "PID";
+    else if (tech === "c#") return "C#";
+    else if (tech === "dotnet") return ".NET";
+    else if (tech === "tailwind") return "Tailwind";
+    else if (tech === "tanstack query") return "TanStack Query";
+    else if (tech === "azure") return "Azure";
+    else if (tech === "cloudflare") return "Cloudflare";
+    else if (tech === "vhdl") return "VHDL";
+    else if (tech === "cpld") return "CPLD";
+    else if (tech === "xilinx ise") return "Xilinx ISE";
+    else if (tech === "c++") return "C++";
+    else if (tech === "opencv") return "OpenCV";
+    else if (tech === "abb") return "ABB Robotics";
+    else if (tech === "rapid") return "ADD RAPID";
+    else if (tech === "matlab") return "MATLAB";
+    else if (tech === "java") return "Java";
+    else if (tech === "tesseract ocr") return "Tesseract OCR";
+    else if (tech === "react") return "React";
+    else if (tech === "react three fiber") return "React Three Fiber";
+    else if (tech === "zig") return "Zig";
+    else if (tech === "python") return "Python";
+    else if (tech === "fastapi") return "FastAPI";
+    else if (tech === "expo") return "Expo";
+    else if (tech === "react native") return "React Native";
+
+    assetUnreachable(tech);
+};
