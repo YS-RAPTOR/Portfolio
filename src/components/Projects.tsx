@@ -55,6 +55,90 @@ const getSelectedProjects = (
     };
 };
 
+const getDifference = (arr1: ProjectType[], arr2: ProjectType[]) => {
+    const difference: ProjectType[] = [];
+    if (arr1.length > arr2.length) {
+        for (let i = 0; i < arr1.length; i++) {
+            let found = false;
+            for (let j = 0; j < arr2.length; j++) {
+                if (arr1[i].title === arr2[j].title) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                difference.push(arr1[i]);
+            }
+        }
+    } else {
+        for (let i = 0; i < arr2.length; i++) {
+            let found = false;
+            for (let j = 0; j < arr1.length; j++) {
+                if (arr2[i].title === arr1[j].title) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                difference.push(arr2[i]);
+            }
+        }
+    }
+    return difference;
+};
+
+const getNewState = (
+    current: (ProjectType | undefined)[],
+    projects: ProjectType[],
+    selected: SelectionState[],
+) => {
+    const selectedJobs = new Set();
+    for (let i = 0; i < selected.length; i++) {
+        if (selected[i].selected) {
+            selectedJobs.add(selected[i].job);
+        }
+    }
+
+    const newState = structuredClone(current);
+    const newSelectedProjects: ProjectType[] = [];
+    const alreadyWithinCurrent: ProjectType[] = [];
+
+    for (let i = 0; i < projects.length; i++) {
+        try {
+            const projectJobs = new Set(projects[i].fields);
+            const intersection = projectJobs.intersection(selectedJobs);
+            if (intersection.size !== 0) {
+                newSelectedProjects.push(projects[i]);
+            }
+        } catch (e) {
+            console.error(e);
+        }
+
+        if (!current[i]) continue;
+        try {
+            const projectJobs = new Set(current[i]!.fields);
+            const intersection = projectJobs.intersection(selectedJobs);
+            if (intersection.size === 0) {
+                newState[i] = undefined;
+            } else {
+                alreadyWithinCurrent.push(current[i]!);
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    // Find difference between newSelectedProjects and alreadyWithinCurrent
+    const difference = getDifference(newSelectedProjects, alreadyWithinCurrent);
+
+    for (let i = 0; i < newState.length; i++) {
+        if (newState[i] === undefined) {
+            newState[i] = difference.pop();
+        }
+    }
+    return newState;
+};
+
 export const Projects = (props: { projects: ProjectType[] }) => {
     const ref = useRef<HTMLDivElement>(null);
 
@@ -127,28 +211,26 @@ export const Projects = (props: { projects: ProjectType[] }) => {
                     );
                 },
                 onComplete: () => {
-                    // setState({
-                    //     prev: state.curr,
-                    //     curr: getSelectedProjects(props.projects, selected)
-                    //         .selectedProjects,
-                    // });
+                    setState({
+                        prev: state.curr,
+                        curr: getNewState(state.curr, props.projects, selected),
+                    });
                 },
             });
         },
         { scope: ref, dependencies: [flipState] },
     );
 
-    // TODO: Change _project to state
     return (
         <div
             ref={ref}
             className="grid w-full auto-rows-fr grid-cols-1 px-[0.75px] sm:grid-cols-2 md:w-2/3"
         >
-            {props.projects.map((_project, index) => (
+            {props.projects.map((_, index) => (
                 <ProjectView
                     key={index}
-                    state={_project}
-                    prevState={_project}
+                    state={state.curr[index]}
+                    prevState={state.prev[index]}
                     isActive={index < flipState.noOfSelectedProjects}
                 />
             ))}
@@ -174,8 +256,8 @@ const ProjectView = (props: {
                 (props.isActive ? "" : "hidden")
             }
         >
-            <ProjectDetails project={props.state} top={true} />
-            <ProjectDetails project={props.prevState} top={false} />
+            <ProjectDetails project={props.prevState} top={true} />
+            <ProjectDetails project={props.state} top={false} />
         </div>
     );
 };
@@ -183,15 +265,16 @@ const ProjectView = (props: {
 const ProjectDetails = (props: { project?: ProjectType; top: boolean }) => {
     if (!props.project) return null;
 
-    const className = props.top ? "swap-top" : "swap-bot absolute inset-0";
+    const className = props.top
+        ? "swap-top h-full"
+        : "swap-bot absolute inset-0";
 
-    // TODO: aspect-[1.5]
     return (
         <div
             className={"flex flex-col justify-between bg-zinc-950 " + className}
         >
             <div>
-                <div className="w-full border-b"></div>
+                <div className="aspect-[1.5] w-full border-b"></div>
                 <div className="flex w-full justify-between border-b">
                     <h1 className="px-2 py-1 font-bold">
                         {props.project.title}
@@ -200,7 +283,7 @@ const ProjectDetails = (props: { project?: ProjectType; top: boolean }) => {
                         {props.project.github && (
                             <a
                                 href={props.project.github}
-                                className="group relative flex h-full cursor-pointer items-center overflow-clip border-l p-2"
+                                className="group relative flex h-full cursor-pointer items-center overflow-clip border-l bg-zinc-950 p-2"
                             >
                                 <div className="absolute inset-1 scale-0 rounded-full bg-zinc-50 transition-transform duration-200 ease-in-out group-hover:scale-150" />
                                 <FaGithub className="mix-blend-difference" />
@@ -209,7 +292,7 @@ const ProjectDetails = (props: { project?: ProjectType; top: boolean }) => {
                         {props.project.link && (
                             <a
                                 href={props.project.link}
-                                className="group relative flex h-full cursor-pointer items-center overflow-clip border-l p-2"
+                                className="group relative flex h-full cursor-pointer items-center overflow-clip border-l bg-zinc-950 p-2"
                             >
                                 <div className="absolute inset-1 scale-0 rounded-full bg-zinc-50 transition-transform duration-200 ease-in-out group-hover:scale-150" />
                                 <FaArrowUpRightFromSquare className="mix-blend-difference" />
