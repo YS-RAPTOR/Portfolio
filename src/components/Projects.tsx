@@ -86,22 +86,24 @@ export const Projects = (props: { projects: ProjectType[] }) => {
         () => {
             if (!flipState.state) return;
             Flip.from(flipState.state, {
-                duration: 0.4,
-                ease: "linear",
+                ease: "power1.inOut",
                 simple: true,
                 absoluteOnLeave: true,
                 nested: true,
+                duration: 0.5,
+                delay: 0.1,
                 onEnter: (el) => {
                     return gsap.fromTo(
                         el,
                         {
-                            opacity: 0,
                             scale: 0,
+                            opacity: 0,
+                            clipPath: "inset(-1px -1px -1px -1px)",
                         },
                         {
-                            opacity: 1,
                             scale: 1,
-                            delay: 0.2,
+                            opacity: 1,
+                            delay: 0.3,
                             duration: 0.3,
                             stagger: 0.1,
                         },
@@ -109,15 +111,18 @@ export const Projects = (props: { projects: ProjectType[] }) => {
                 },
                 onLeave: (el) => {
                     return gsap.fromTo(
-                        el,
+                        el.toReversed(),
                         {
-                            scale: 1,
+                            clipPath: "inset(-1px -1px -1px -1px)",
                             opacity: 1,
+                            zIndex: -1,
                         },
                         {
-                            scale: 0,
+                            clipPath: "inset(-1px -1px 100% -1px)",
+                            delay: -0.1,
                             opacity: 0,
-                            duration: 0.1,
+                            duration: 0.2,
+                            stagger: 0.05,
                         },
                     );
                 },
@@ -147,9 +152,12 @@ export const Projects = (props: { projects: ProjectType[] }) => {
                     isActive={index < flipState.noOfSelectedProjects}
                 />
             ))}
-            {flipState.noOfSelectedProjects % 2 === 1 && (
-                <div className="swap relative hidden h-full w-full text-sm outline outline-1 outline-zinc-50 sm:block lg:text-base" />
-            )}
+            <div
+                className={
+                    "swap relative hidden h-full w-full text-sm outline outline-1 outline-zinc-50 lg:text-base " +
+                    (flipState.noOfSelectedProjects % 2 === 1 ? "sm:block" : "")
+                }
+            />
         </div>
     );
 };
@@ -177,7 +185,7 @@ const ProjectDetails = (props: { project?: ProjectType; top: boolean }) => {
 
     const className = props.top ? "swap-top" : "swap-bot absolute inset-0";
 
-    // aspect-[1.5]
+    // TODO: aspect-[1.5]
     return (
         <div
             className={"flex flex-col justify-between bg-zinc-950 " + className}
@@ -214,7 +222,7 @@ const ProjectDetails = (props: { project?: ProjectType; top: boolean }) => {
                 </p>
             </div>
             <div className="flex flex-wrap gap-1 p-1 text-xs font-light lg:text-sm">
-                {props.project.tech.map((tech, index) => (
+                {props.project.tech.map((tech) => (
                     <TechName key={tech} tech={tech} />
                 ))}
             </div>
