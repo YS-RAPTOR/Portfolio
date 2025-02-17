@@ -1,45 +1,189 @@
 import { gsap } from "gsap";
+import { Flip } from "gsap/dist/Flip";
 import { useGSAP } from "@gsap/react";
-import { useEffect, useRef } from "react";
-import { Image } from "astro:assets";
+import { useEffect, useRef, useState } from "react";
 import type { CollectionEntry } from "astro:content";
 import { FaGithub } from "react-icons/fa";
 import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 import { TechName } from "./Tech";
+import { noOfSelected, useStore, type SelectionState } from "../utils/store";
 
 type ProjectType = CollectionEntry<"projects">["data"];
+type FlipState = {
+    state: Flip.FlipState | null;
+    noOfSelectedProjects: number;
+};
 
-// TODO: Do swap animation
-// Then do flip animation to change add/remove elements
+const getSelectedProjects = (
+    projects: ProjectType[],
+    selected: SelectionState[],
+) => {
+    const selectedFields = new Set();
+    for (let i = 0; i < selected.length; i++) {
+        if (selected[i].selected) {
+            selectedFields.add(selected[i].job);
+        }
+    }
+
+    const selectedProjects: (ProjectType | undefined)[] = [];
+
+    for (let i = 0; i < projects.length; i++) {
+        try {
+            const projectField = new Set(projects[i].fields);
+            const intersection = projectField.intersection(selectedFields);
+            if (intersection.size !== 0) {
+                selectedProjects.push(projects[i]);
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    }
+    const noOfSelectedProjects = selectedProjects.length;
+    const left = projects.length - noOfSelectedProjects;
+
+    for (let i = 0; i < left; i++) {
+        selectedProjects.push(undefined);
+    }
+
+    if (selectedProjects.length !== projects.length) {
+        console.error("Selected projects length is same as projects length");
+    }
+
+    return {
+        noOfSelectedProjects,
+        selectedProjects,
+    };
+};
+
 export const Projects = (props: { projects: ProjectType[] }) => {
-    // TODO:
-    // Step 1 - Have projects displayed
-    // Step 2 - User changes selected
-    // Step 3 - Move all elements to be deleted to the end using swap animation.
-    // Setp 4 - Get flip state
-    // Step 5 - Update state
+    const ref = useRef<HTMLDivElement>(null);
 
+    const selected = useStore((state) => state.selected);
+    const selectedProjects = getSelectedProjects(props.projects, selected);
+    const [flipState, setFlipState] = useState<FlipState>({
+        state: null,
+        noOfSelectedProjects: selectedProjects.noOfSelectedProjects,
+    });
+    const [state, setState] = useState({
+        prev: selectedProjects.selectedProjects,
+        curr: selectedProjects.selectedProjects,
+    });
+
+    useEffect(() => {
+        if (!ref.current) return;
+
+        const dom: HTMLDivElement[] = gsap.utils.toArray(".swap", ref.current);
+        dom.push(ref.current);
+
+        setFlipState({
+            state: Flip.getState(dom),
+            noOfSelectedProjects: getSelectedProjects(props.projects, selected)
+                .noOfSelectedProjects,
+        });
+    }, [selected]);
+
+    useGSAP(
+        () => {
+            if (!flipState.state) return;
+            Flip.from(flipState.state, {
+                duration: 0.4,
+                ease: "linear",
+                simple: true,
+                absoluteOnLeave: true,
+                nested: true,
+                onEnter: (el) => {
+                    return gsap.fromTo(
+                        el,
+                        {
+                            opacity: 0,
+                            scale: 0,
+                        },
+                        {
+                            opacity: 1,
+                            scale: 1,
+                            delay: 0.2,
+                            duration: 0.3,
+                            stagger: 0.1,
+                        },
+                    );
+                },
+                onLeave: (el) => {
+                    return gsap.fromTo(
+                        el,
+                        {
+                            scale: 1,
+                            opacity: 1,
+                        },
+                        {
+                            scale: 0,
+                            opacity: 0,
+                            duration: 0.1,
+                        },
+                    );
+                },
+                onComplete: () => {
+                    // setState({
+                    //     prev: state.curr,
+                    //     curr: getSelectedProjects(props.projects, selected)
+                    //         .selectedProjects,
+                    // });
+                },
+            });
+        },
+        { scope: ref, dependencies: [flipState] },
+    );
+
+    // TODO: Change _project to state
     return (
-        <div className="grid w-full grid-cols-1 px-[0.75px] sm:grid-cols-2 md:w-2/3">
-            {props.projects.map((project, index) => (
-                <ProjectView key={index} project={project} />
+        <div
+            ref={ref}
+            className="grid w-full auto-rows-fr grid-cols-1 px-[0.75px] sm:grid-cols-2 md:w-2/3"
+        >
+            {props.projects.map((_project, index) => (
+                <ProjectView
+                    key={index}
+                    state={_project}
+                    prevState={_project}
+                    isActive={index < flipState.noOfSelectedProjects}
+                />
             ))}
-            {props.projects.length % 2 === 1 && <ProjectView />}
+            {flipState.noOfSelectedProjects % 2 === 1 && (
+                <div className="swap relative hidden h-full w-full text-sm outline outline-1 outline-zinc-50 sm:block lg:text-base" />
+            )}
         </div>
     );
 };
 
-const ProjectView = (props: { project?: ProjectType }) => {
-    if (!props.project) {
-        return (
-            <div className="hidden aspect-square w-full bg-zinc-950 outline outline-1 outline-zinc-50 sm:block"></div>
-        );
-    }
-
+const ProjectView = (props: {
+    state?: ProjectType;
+    prevState?: ProjectType;
+    isActive: boolean;
+}) => {
     return (
-        <div className="flex h-full w-full flex-col justify-between bg-zinc-950 text-sm outline outline-1 outline-zinc-50 lg:text-base">
+        <div
+            className={
+                "swap relative h-full w-full text-sm outline outline-1 outline-zinc-50 lg:text-base " +
+                (props.isActive ? "" : "hidden")
+            }
+        >
+            <ProjectDetails project={props.state} top={true} />
+            <ProjectDetails project={props.prevState} top={false} />
+        </div>
+    );
+};
+
+const ProjectDetails = (props: { project?: ProjectType; top: boolean }) => {
+    if (!props.project) return null;
+
+    const className = props.top ? "swap-top" : "swap-bot absolute inset-0";
+
+    // aspect-[1.5]
+    return (
+        <div
+            className={"flex flex-col justify-between bg-zinc-950 " + className}
+        >
             <div>
-                <div className="aspect-[1.5] w-full border-b"></div>
+                <div className="w-full border-b"></div>
                 <div className="flex w-full justify-between border-b">
                     <h1 className="px-2 py-1 font-bold">
                         {props.project.title}
@@ -65,7 +209,9 @@ const ProjectView = (props: { project?: ProjectType }) => {
                         )}
                     </div>
                 </div>
-                <p className="px-1">{props.project.description}</p>
+                <p className="px-1">
+                    {props.project.description} {props.top ? "TOP" : "BOT"}
+                </p>
             </div>
             <div className="flex flex-wrap gap-1 p-1 text-xs font-light lg:text-sm">
                 {props.project.tech.map((tech, index) => (
