@@ -12,22 +12,25 @@ import * as THREE from "three";
 // Add text/SVG to the blocks
 
 const FallingConstants = {
-    VerticalSpacing: 0.05,
+    VerticalSpacing: 1,
     VerticalStartLocation: 0,
     RotationRange: (60 * Math.PI) / 180,
     HorizontalRange: 0.5,
 };
 
+const randomColor = () => {
+    return new THREE.Color(Math.random(), Math.random(), Math.random());
+};
+
 class Falling {
-    canvas: HTMLCanvasElement;
     renderer: THREE.WebGLRenderer;
     camera: THREE.OrthographicCamera;
     scene: THREE.Scene;
-    physicsWorld: RAPIER.World;
-    objects: { mesh: THREE.Mesh; collider: RAPIER.RigidBodyHandle }[] = [];
+    world: RAPIER.World;
+    objects: { mesh: THREE.Mesh; collider: RAPIER.RigidBody }[] = [];
 
     constructor(canvas: HTMLCanvasElement, width: number, height: number) {
-        this.canvas = canvas;
+        // Renderer
         this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
         this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
@@ -36,6 +39,27 @@ class Falling {
 
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0x09090b);
+
+        // Physics
+        const gravity = { x: 0.0, y: -1.81 };
+        this.world = new RAPIER.World(gravity);
+
+        const floor = RAPIER.ColliderDesc.cuboid(10, 0.1).setTranslation(
+            0,
+            -1.1,
+        );
+        const leftWall = RAPIER.ColliderDesc.cuboid(0.1, 100).setTranslation(
+            -1.1,
+            0,
+        );
+        const rightWall = RAPIER.ColliderDesc.cuboid(0.1, 100).setTranslation(
+            1.1,
+            0,
+        );
+
+        this.world.createCollider(floor);
+        this.world.createCollider(leftWall);
+        this.world.createCollider(rightWall);
 
         for (let i = 0; i < technologies.length; i++) {
             const y =
@@ -61,18 +85,43 @@ class Falling {
         const height = 0.1;
 
         const geometry = new THREE.PlaneGeometry(width, height);
-        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+
+        const material = new THREE.MeshBasicMaterial({ color: randomColor() });
         const mesh = new THREE.Mesh(geometry, material);
         mesh.position.set(pos.x, pos.y, 0);
         mesh.rotation.set(0, 0, rotation);
         this.scene.add(mesh);
+
+        const colliderDesc = RAPIER.ColliderDesc.cuboid(
+            width * 0.5,
+            height * 0.5,
+        );
+        const rigidBodyDesc = RAPIER.RigidBodyDesc.dynamic()
+            .setTranslation(pos.x, pos.y)
+            .setRotation(rotation);
+        const rigidBody = this.world.createRigidBody(rigidBodyDesc);
+        this.world.createCollider(colliderDesc, rigidBody);
+
+        this.objects.push({ mesh, collider: rigidBody });
     }
 
     handleResize(width: number, height: number) {
         this.renderer.setSize(width, height);
     }
 
+    update() {
+        for (let i = 0; i < this.objects.length; i++) {
+            const { mesh, collider } = this.objects[i];
+            const pos = collider.translation();
+            const rot = collider.rotation();
+            mesh.position.set(pos.x, pos.y, 0);
+            mesh.rotation.set(0, 0, rot);
+        }
+    }
+
     render(t: number = 0) {
+        this.world.step();
+        this.update();
         this.renderer.render(this.scene, this.camera);
         requestAnimationFrame(() => this.render());
     }
