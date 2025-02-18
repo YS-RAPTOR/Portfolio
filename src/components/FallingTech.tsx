@@ -12,10 +12,12 @@ import * as THREE from "three";
 // Add text/SVG to the blocks
 
 const FallingConstants = {
-    VerticalSpacing: 1,
+    VerticalSpacing: 0.2,
     VerticalStartLocation: 0,
     RotationRange: (60 * Math.PI) / 180,
     HorizontalRange: 0.5,
+    ImpulseForce: 0.15,
+    MaxDistance: 0.5,
 };
 
 const randomColor = () => {
@@ -100,9 +102,31 @@ class Falling {
             .setTranslation(pos.x, pos.y)
             .setRotation(rotation);
         const rigidBody = this.world.createRigidBody(rigidBodyDesc);
-        this.world.createCollider(colliderDesc, rigidBody);
+        const collider = this.world.createCollider(colliderDesc, rigidBody);
+        collider.setRestitution(0.5);
+        collider.setDensity(1.0);
 
         this.objects.push({ mesh, collider: rigidBody });
+    }
+
+    click(x: number, y: number) {
+        const clickPos = new THREE.Vector2(x, y);
+
+        for (let i = 0; i < this.objects.length; i++) {
+            const { collider } = this.objects[i];
+            const pos = collider.translation();
+            const vec = new THREE.Vector2(pos.x, pos.y);
+
+            const distance = clickPos.distanceTo(vec);
+            if (distance > FallingConstants.MaxDistance) continue;
+
+            const direction = vec.sub(clickPos).normalize();
+            const impulseForce =
+                (1 - distance / FallingConstants.MaxDistance) *
+                FallingConstants.ImpulseForce;
+
+            collider.applyImpulse(direction.multiplyScalar(impulseForce), true);
+        }
     }
 
     handleResize(width: number, height: number) {
@@ -146,10 +170,22 @@ export const FallingTech = () => {
             );
         };
 
+        const handlePointerDown = (e: PointerEvent) => {
+            if (e.target === null) return;
+            const target = e.target as HTMLElement;
+
+            falling.click(
+                (e.offsetX / target.clientWidth) * 2 - 1,
+                (1 - e.offsetY / target.clientHeight) * 2 - 1,
+            );
+        };
+
         window.addEventListener("resize", handleResize);
+        ref.current.addEventListener("pointerdown", handlePointerDown);
 
         return () => {
             window.removeEventListener("resize", handleResize);
+            ref.current?.removeEventListener("pointerdown", handlePointerDown);
         };
     }, []);
 
