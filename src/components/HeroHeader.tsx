@@ -19,12 +19,12 @@ export const HeroHeader = () => {
 
     return (
         <div className="grid grid-flow-dense grid-cols-2 grid-rows-2">
-            <h1 className="flex h-full w-full items-center justify-center border-r p-1 text-center text-lg sm:text-2xl md:text-5xl lg:text-7xl">
+            <h1 className="flex h-full w-full items-center justify-center border-r p-1 text-center text-lg font-black sm:text-2xl md:text-5xl lg:text-7xl">
                 Yashan
             </h1>
             <div className="flex w-full items-center justify-center gap-2 p-1">
                 <FaLocationDot className="h-5 w-5 md:h-8 md:w-8 lg:h-10 lg:w-10" />
-                <h2 className="text-xs font-extralight md:text-sm lg:text-base">
+                <h2 className="text-xs font-light md:text-sm lg:text-base">
                     Melbourne,
                     <br />
                     Australia.

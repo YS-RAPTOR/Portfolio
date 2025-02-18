@@ -5,10 +5,6 @@ import RAPIER from "@dimforge/rapier2d-compat";
 import * as THREE from "three";
 
 // TODO:
-// Spawn falling squares with collision.
-// Ability to move the collisions using mouse/pointer and dragging them.
-// Create a physics force that pushes out blocks when click on location.
-// Pick what I like.
 // Add text/SVG to the blocks
 
 const FallingConstants = {
@@ -26,7 +22,6 @@ const randomColor = () => {
 };
 
 class Falling {
-    intersectionObserver: IntersectionObserver;
     renderer: THREE.WebGLRenderer;
     camera: THREE.OrthographicCamera;
     scene: THREE.Scene;
@@ -34,8 +29,8 @@ class Falling {
     objects: { mesh: THREE.Mesh; collider: RAPIER.RigidBody }[] = [];
 
     constructor(canvas: HTMLCanvasElement, width: number, height: number) {
-        // Renderer
-        this.intersectionObserver = new IntersectionObserver(
+        // Intersection Observer
+        new IntersectionObserver(
             (entries, observer) => {
                 for (let i = 0; i < entries.length; i++) {
                     if (entries[i].isIntersecting) {
@@ -47,8 +42,9 @@ class Falling {
             {
                 threshold: 0.8,
             },
-        );
-        this.intersectionObserver.observe(canvas);
+        ).observe(canvas);
+
+        // Renderer
         this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
         this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
@@ -211,8 +207,8 @@ export const FallingTech = () => {
 
     return (
         <div ref={container} className="relative aspect-video w-full bg-none">
-            <p className="absolute left-0 top-0 z-10 p-1 text-2xs opacity-10">
-                Click Me
+            <p className="absolute left-0 top-0 z-10 p-1 text-2xs font-light opacity-30">
+                Click On the Canvas
             </p>
             <canvas ref={ref} className="absolute inset-0" />
         </div>
