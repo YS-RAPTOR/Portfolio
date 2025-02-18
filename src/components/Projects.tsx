@@ -6,170 +6,77 @@ import type { CollectionEntry } from "astro:content";
 import { FaGithub } from "react-icons/fa";
 import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 import { TechName } from "./Tech";
-import { noOfSelected, useStore, type SelectionState } from "../utils/store";
+import { useStore, type SelectionState } from "../utils/store";
 
 type ProjectType = CollectionEntry<"projects">["data"];
-type FlipState = {
-    state: Flip.FlipState | null;
-    noOfSelectedProjects: number;
+type State = {
+    flip: Flip.FlipState | null;
+    projects: {
+        project: ProjectType;
+        selected: boolean;
+    }[];
 };
 
 const getSelectedProjects = (
     projects: ProjectType[],
     selected: SelectionState[],
 ) => {
-    const selectedFields = new Set();
-    for (let i = 0; i < selected.length; i++) {
-        if (selected[i].selected) {
-            selectedFields.add(selected[i].job);
-        }
-    }
-
-    const selectedProjects: (ProjectType | undefined)[] = [];
-
-    for (let i = 0; i < projects.length; i++) {
-        try {
-            const projectField = new Set(projects[i].fields);
-            const intersection = projectField.intersection(selectedFields);
-            if (intersection.size !== 0) {
-                selectedProjects.push(projects[i]);
-            }
-        } catch (e) {
-            console.log(e);
-        }
-    }
-    const noOfSelectedProjects = selectedProjects.length;
-    const left = projects.length - noOfSelectedProjects;
-
-    for (let i = 0; i < left; i++) {
-        selectedProjects.push(undefined);
-    }
-
-    if (selectedProjects.length !== projects.length) {
-        console.error("Selected projects length is same as projects length");
-    }
-
-    return {
-        noOfSelectedProjects,
-        selectedProjects,
-    };
-};
-
-const getDifference = (arr1: ProjectType[], arr2: ProjectType[]) => {
-    const difference: ProjectType[] = [];
-    if (arr1.length > arr2.length) {
-        for (let i = 0; i < arr1.length; i++) {
-            let found = false;
-            for (let j = 0; j < arr2.length; j++) {
-                if (arr1[i].title === arr2[j].title) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                difference.push(arr1[i]);
-            }
-        }
-    } else {
-        for (let i = 0; i < arr2.length; i++) {
-            let found = false;
-            for (let j = 0; j < arr1.length; j++) {
-                if (arr2[i].title === arr1[j].title) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                difference.push(arr2[i]);
-            }
-        }
-    }
-    return difference;
-};
-
-const getNewState = (
-    current: (ProjectType | undefined)[],
-    projects: ProjectType[],
-    selected: SelectionState[],
-) => {
     const selectedJobs = new Set();
     for (let i = 0; i < selected.length; i++) {
-        if (selected[i].selected) {
-            selectedJobs.add(selected[i].job);
-        }
+        if (selected[i].selected) selectedJobs.add(selected[i].job);
     }
 
-    const newState = structuredClone(current);
-    const newSelectedProjects: ProjectType[] = [];
-    const alreadyWithinCurrent: ProjectType[] = [];
+    const p: State["projects"] = [];
 
     for (let i = 0; i < projects.length; i++) {
         try {
             const projectJobs = new Set(projects[i].fields);
-            const intersection = projectJobs.intersection(selectedJobs);
-            if (intersection.size !== 0) {
-                newSelectedProjects.push(projects[i]);
-            }
-        } catch (e) {
-            console.error(e);
-        }
-
-        if (!current[i]) continue;
-        try {
-            const projectJobs = new Set(current[i]!.fields);
-            const intersection = projectJobs.intersection(selectedJobs);
-            if (intersection.size === 0) {
-                newState[i] = undefined;
-            } else {
-                alreadyWithinCurrent.push(current[i]!);
-            }
+            const intersection = selectedJobs.intersection(projectJobs);
+            p.push({
+                project: projects[i],
+                selected: intersection.size > 0,
+            });
         } catch (e) {
             console.error(e);
         }
     }
-
-    // Find difference between newSelectedProjects and alreadyWithinCurrent
-    const difference = getDifference(newSelectedProjects, alreadyWithinCurrent);
-
-    for (let i = 0; i < newState.length; i++) {
-        if (newState[i] === undefined) {
-            newState[i] = difference.pop();
-        }
-    }
-    return newState;
+    return p;
 };
 
+const getNoOfSelected = (projects: State["projects"]) => {
+    let count = 0;
+    for (let i = 0; i < projects.length; i++) {
+        if (projects[i].selected) count++;
+    }
+    return count;
+};
+
+//TODO: Add scroll trigger Maybe
 export const Projects = (props: { projects: ProjectType[] }) => {
     const ref = useRef<HTMLDivElement>(null);
-
-    const selected = useStore((state) => state.selected);
-    const selectedProjects = getSelectedProjects(props.projects, selected);
-    const [flipState, setFlipState] = useState<FlipState>({
-        state: null,
-        noOfSelectedProjects: selectedProjects.noOfSelectedProjects,
-    });
-    const [state, setState] = useState({
-        prev: selectedProjects.selectedProjects,
-        curr: selectedProjects.selectedProjects,
+    const selected = useStore((s) => s.selected);
+    const [state, setState] = useState<State>({
+        flip: null,
+        projects: [],
     });
 
     useEffect(() => {
         if (!ref.current) return;
-
-        const dom: HTMLDivElement[] = gsap.utils.toArray(".swap", ref.current);
+        const dom: HTMLDivElement[] = gsap.utils.toArray(
+            ".project, .special",
+            ref.current,
+        );
         dom.push(ref.current);
-
-        setFlipState({
-            state: Flip.getState(dom),
-            noOfSelectedProjects: getSelectedProjects(props.projects, selected)
-                .noOfSelectedProjects,
+        setState({
+            flip: Flip.getState(dom),
+            projects: getSelectedProjects(props.projects, selected),
         });
     }, [selected]);
 
     useGSAP(
         () => {
-            if (!flipState.state) return;
-            Flip.from(flipState.state, {
+            if (!state.flip) return;
+            Flip.from(state.flip, {
                 ease: "power1.inOut",
                 simple: true,
                 absoluteOnLeave: true,
@@ -210,15 +117,9 @@ export const Projects = (props: { projects: ProjectType[] }) => {
                         },
                     );
                 },
-                onComplete: () => {
-                    setState({
-                        prev: state.curr,
-                        curr: getNewState(state.curr, props.projects, selected),
-                    });
-                },
             });
         },
-        { scope: ref, dependencies: [flipState] },
+        { scope: ref, dependencies: [state] },
     );
 
     return (
@@ -226,52 +127,32 @@ export const Projects = (props: { projects: ProjectType[] }) => {
             ref={ref}
             className="grid w-full auto-rows-fr grid-cols-1 px-[0.75px] sm:grid-cols-2 md:w-2/3"
         >
-            {props.projects.map((_, index) => (
+            {state.projects.map((p, index) => (
                 <ProjectView
+                    project={p.project}
+                    isActive={p.selected}
                     key={index}
-                    state={state.curr[index]}
-                    prevState={state.prev[index]}
-                    isActive={index < flipState.noOfSelectedProjects}
                 />
             ))}
             <div
                 className={
-                    "swap relative hidden h-full w-full text-sm outline outline-1 outline-zinc-50 lg:text-base " +
-                    (flipState.noOfSelectedProjects % 2 === 1 ? "sm:block" : "")
+                    "special relative hidden h-full w-full text-sm outline outline-1 outline-zinc-50 lg:text-base " +
+                    (getNoOfSelected(state.projects) % 2 === 1
+                        ? "sm:block"
+                        : "")
                 }
             />
         </div>
     );
 };
 
-const ProjectView = (props: {
-    state?: ProjectType;
-    prevState?: ProjectType;
-    isActive: boolean;
-}) => {
+const ProjectView = (props: { project: ProjectType; isActive: boolean }) => {
     return (
         <div
             className={
-                "swap relative h-full w-full text-sm outline outline-1 outline-zinc-50 lg:text-base " +
+                "project relative flex h-full w-full flex-col justify-between text-sm outline outline-1 outline-zinc-50 lg:text-base " +
                 (props.isActive ? "" : "hidden")
             }
-        >
-            <ProjectDetails project={props.prevState} top={true} />
-            <ProjectDetails project={props.state} top={false} />
-        </div>
-    );
-};
-
-const ProjectDetails = (props: { project?: ProjectType; top: boolean }) => {
-    if (!props.project) return null;
-
-    const className = props.top
-        ? "swap-top h-full"
-        : "swap-bot absolute inset-0";
-
-    return (
-        <div
-            className={"flex flex-col justify-between bg-zinc-950 " + className}
         >
             <div>
                 <div className="aspect-[1.5] w-full border-b"></div>
@@ -300,9 +181,7 @@ const ProjectDetails = (props: { project?: ProjectType; top: boolean }) => {
                         )}
                     </div>
                 </div>
-                <p className="px-1">
-                    {props.project.description} {props.top ? "TOP" : "BOT"}
-                </p>
+                <p className="px-1">{props.project.description}</p>
             </div>
             <div className="flex flex-wrap gap-1 p-1 text-xs font-light lg:text-sm">
                 {props.project.tech.map((tech) => (

@@ -39,6 +39,7 @@ export const Test = () => {
                 </button>
             </div>
             <TestMain activeFilters={activeFilters} />
+            <h1 className="w-svw bg-sky-200">HELLLO</h1>
         </div>
     );
 };
@@ -84,8 +85,12 @@ const TestMain = (props: { activeFilters: ActiveFilters }) => {
             props.activeFilters,
             numbers,
         );
+
+        const dom: HTMLDivElement[] = gsap.utils.toArray(".swap", ref.current);
+        dom.push(ref.current!);
+
         setFlipState({
-            state: Flip.getState(q(".swap")),
+            state: Flip.getState(dom),
             activeNo: filteredNumbers.length,
         });
     }, [props.activeFilters]);
@@ -94,12 +99,13 @@ const TestMain = (props: { activeFilters: ActiveFilters }) => {
         () => {
             if (!flipState.state) return;
 
-            const tl = Flip.from(flipState.state, {
-                duration: 0.4,
-                ease: "power1.inOut",
-                absolute: true,
+            Flip.from(flipState.state, {
+                duration: 2,
+                ease: "linear",
                 simple: true,
-                scale: true,
+                absoluteOnLeave: true,
+                nested: true,
+                targets: ".swap",
                 onEnter: (el) => {
                     return gsap.fromTo(
                         el,
@@ -127,12 +133,11 @@ const TestMain = (props: { activeFilters: ActiveFilters }) => {
                             scale: 0,
                             opacity: 0,
                             duration: 0.1,
-                            stagger: 0.02,
                         },
                     );
                 },
                 onComplete: () => {
-                    setState(getFilteredNumbers(props.activeFilters, numbers));
+                    // setState(getFilteredNumbers(props.activeFilters, numbers));
                 },
             });
         },
@@ -142,7 +147,10 @@ const TestMain = (props: { activeFilters: ActiveFilters }) => {
     useGSAP(() => {}, { scope: ref, dependencies: [state] });
 
     return (
-        <div className="grid auto-cols-fr grid-cols-3 gap-2" ref={ref}>
+        <div
+            ref={ref}
+            className="grid auto-cols-fr grid-cols-3 gap-2 border border-zinc-950 p-2"
+        >
             {state.map((n, index) => (
                 <TestView key={n} i={n} isActive={index < flipState.activeNo} />
             ))}
