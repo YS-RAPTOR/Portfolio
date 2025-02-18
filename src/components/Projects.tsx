@@ -136,7 +136,7 @@ export const Projects = (props: { projects: ProjectType[] }) => {
             ))}
             <div
                 className={
-                    "special relative hidden h-full w-full text-sm outline outline-1 outline-zinc-50 lg:text-base " +
+                    "special relative hidden h-full w-full bg-zinc-950 text-sm outline outline-1 outline-zinc-50 lg:text-base " +
                     (getNoOfSelected(state.projects) % 2 === 1
                         ? "sm:block"
                         : "")
@@ -150,7 +150,7 @@ const ProjectView = (props: { project: ProjectType; isActive: boolean }) => {
     return (
         <div
             className={
-                "project relative flex h-full w-full flex-col justify-between text-sm outline outline-1 outline-zinc-50 lg:text-base " +
+                "project relative flex h-full w-full flex-col justify-between bg-zinc-950 text-sm outline outline-1 outline-zinc-50 lg:text-base " +
                 (props.isActive ? "" : "hidden")
             }
         >
