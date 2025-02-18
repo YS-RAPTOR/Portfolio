@@ -22,7 +22,6 @@
     import { TextPlugin } from "gsap/TextPlugin";
     import { ScrollTrigger } from "gsap/ScrollTrigger";
     import { useGSAP } from "@gsap/react";
-    import { useStore } from "../utils/store.ts";
     import { Flip } from "gsap/dist/Flip";
 
     gsap.registerPlugin(
@@ -33,5 +32,11 @@
         Flip,
     );
 
+    // Initialize the store
+    import { useStore } from "../utils/store.ts";
     useStore.getState().initializeState();
+
+    // Initialize Rapier
+    import RAPIER from "@dimforge/rapier2d-compat";
+    await RAPIER.init();
 </script>
