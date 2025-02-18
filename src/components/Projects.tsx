@@ -5,8 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import type { CollectionEntry } from "astro:content";
 import { FaGithub } from "react-icons/fa";
 import { FaArrowUpRightFromSquare } from "react-icons/fa6";
-import { TechName } from "./Tech";
 import { useStore, type SelectionState } from "../utils/store";
+import { getTechName } from "../utils/lib.ts";
 
 type ProjectType = CollectionEntry<"projects">["data"];
 type State = {
@@ -57,7 +57,7 @@ export const Projects = (props: { projects: ProjectType[] }) => {
     const selected = useStore((s) => s.selected);
     const [state, setState] = useState<State>({
         flip: null,
-        projects: [],
+        projects: props.projects.map((p) => ({ project: p, selected: true })),
     });
 
     useEffect(() => {
@@ -185,7 +185,9 @@ const ProjectView = (props: { project: ProjectType; isActive: boolean }) => {
             </div>
             <div className="flex flex-wrap gap-1 p-1 text-xs font-light lg:text-sm">
                 {props.project.tech.map((tech) => (
-                    <TechName key={tech} tech={tech} />
+                    <div key={tech} className="border px-1 py-0.5">
+                        {getTechName(tech)}
+                    </div>
                 ))}
             </div>
         </div>

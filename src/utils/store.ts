@@ -17,8 +17,8 @@ interface Store {
 }
 
 export const useStore = create<Store>()((set, get) => ({
-    selected: jobTypes.map((j) => ({ selected: false, job: j })),
-    prevSelected: jobTypes.map((j) => ({ selected: false, job: j })),
+    selected: jobTypes.map((j) => ({ selected: true, job: j })),
+    prevSelected: jobTypes.map((j) => ({ selected: true, job: j })),
 
     initializeState: () => {
         const selected = getSelectedJobs() ?? jobTypes;

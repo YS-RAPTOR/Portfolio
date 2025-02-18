@@ -53,8 +53,15 @@ const projects = (await getCollection("projects", ({ data }) => data.done)).map(
         <!-- @ts-ignore -->
         <Projects projects={projects} client:load />
     </section>
-    <section id="About">
+    <section id="About" class="">
         <h1>About Me</h1>
+        <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam non
+            enim elit. Phasellus pretium nisi nec diam pharetra, vitae imperdiet
+            orci vestibulum. Orci varius natoque penatibus et magnis dis
+            parturient montes, nascetur ridiculus mus. Suspendisse nibh ante,
+            eleifend sed pretium sed, porttitor vel urna.
+        </p>
     </section>
     <section id="Contact">
         <h1>Reach out to me</h1>
