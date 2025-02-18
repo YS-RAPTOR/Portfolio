@@ -5,7 +5,7 @@ import { HeroBackground } from "../components/HeroBackground.tsx";
 import { HeroHeader } from "../components/HeroHeader.tsx";
 import { Projects } from "../components/Projects.tsx";
 import { ProjectsHeader } from "../components/ProjectsHeader.tsx";
-import { Test } from "../components/Test.tsx";
+import { FallingTech } from "../components/FallingTech.tsx";
 
 import { getCollection } from "astro:content";
 
@@ -53,15 +53,28 @@ const projects = (await getCollection("projects", ({ data }) => data.done)).map(
         <!-- @ts-ignore -->
         <Projects projects={projects} client:load />
     </section>
-    <section id="About" class="">
-        <h1>About Me</h1>
-        <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam non
-            enim elit. Phasellus pretium nisi nec diam pharetra, vitae imperdiet
-            orci vestibulum. Orci varius natoque penatibus et magnis dis
-            parturient montes, nascetur ridiculus mus. Suspendisse nibh ante,
-            eleifend sed pretium sed, porttitor vel urna.
-        </p>
+    <section id="About" class="flex h-fit flex-col items-center border-b">
+        <div
+            class="flex h-fit w-full flex-col items-center overflow-clip border-x md:w-2/3"
+        >
+            <h1 class="p-2 text-lg font-extralight md:p-4 lg:p-6 lg:text-2xl">
+                ABOUT ME
+            </h1>
+        </div>
+        <div class="w-full border-b"></div>
+        <div
+            class="flex h-fit w-full flex-col items-center overflow-clip border-x md:w-2/3"
+        >
+            <p class="border-b p-2 text-center text-xs md:text-sm lg:text-base">
+                TODO: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                Etiam non enim elit. Phasellus pretium nisi nec diam pharetra,
+                vitae imperdiet orci vestibulum. Orci varius natoque penatibus
+                et magnis dis parturient montes, nascetur ridiculus mus.
+                Suspendisse nibh ante, eleifend sed pretium sed, porttitor vel
+                urna.
+            </p>
+            <FallingTech client:load />
+        </div>
     </section>
     <section id="Contact">
         <h1>Reach out to me</h1>
