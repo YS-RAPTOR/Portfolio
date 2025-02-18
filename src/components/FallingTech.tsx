@@ -13,11 +13,12 @@ import * as THREE from "three";
 
 const FallingConstants = {
     VerticalSpacing: 0.2,
-    VerticalStartLocation: 0,
+    VerticalStartLocation: 1.5,
     RotationRange: (60 * Math.PI) / 180,
     HorizontalRange: 0.5,
-    ImpulseForce: 0.15,
-    MaxDistance: 0.5,
+    ImpulseForce: 0.05,
+    TorqueRange: 0.001,
+    MaxDistance: 1,
 };
 
 const randomColor = () => {
@@ -43,7 +44,7 @@ class Falling {
         this.scene.background = new THREE.Color(0x09090b);
 
         // Physics
-        const gravity = { x: 0.0, y: -1.81 };
+        const gravity = { x: 0.0, y: -0.8 };
         this.world = new RAPIER.World(gravity);
 
         const floor = RAPIER.ColliderDesc.cuboid(10, 0.1).setTranslation(
@@ -76,9 +77,6 @@ class Falling {
 
             this.spawn(technologies[i], { x, y }, rotation);
         }
-
-        // TODO: Move
-        this.render();
     }
 
     spawn(tech: Technology, pos: { x: number; y: number }, rotation: number) {
@@ -102,6 +100,12 @@ class Falling {
             .setTranslation(pos.x, pos.y)
             .setRotation(rotation);
         const rigidBody = this.world.createRigidBody(rigidBodyDesc);
+        rigidBody.addTorque(
+            Math.random() * FallingConstants.TorqueRange * 2 -
+                FallingConstants.TorqueRange,
+            true,
+        );
+
         const collider = this.world.createCollider(colliderDesc, rigidBody);
         collider.setRestitution(0.5);
         collider.setDensity(1.0);
@@ -134,6 +138,7 @@ class Falling {
     }
 
     update() {
+        // TODO: Always upright
         for (let i = 0; i < this.objects.length; i++) {
             const { mesh, collider } = this.objects[i];
             const pos = collider.translation();
@@ -183,9 +188,25 @@ export const FallingTech = () => {
         window.addEventListener("resize", handleResize);
         ref.current.addEventListener("pointerdown", handlePointerDown);
 
+        const ctx = gsap.context(() => {
+            gsap.to(
+                { n: 0 },
+                {
+                    n: 1,
+                    duration: 0.1,
+                    scrollTrigger: {
+                        trigger: container.current,
+                        start: "center center",
+                    },
+                    onStart: () => falling.render(),
+                },
+            );
+        });
+
         return () => {
             window.removeEventListener("resize", handleResize);
             ref.current?.removeEventListener("pointerdown", handlePointerDown);
+            ctx.kill();
         };
     }, []);
 
