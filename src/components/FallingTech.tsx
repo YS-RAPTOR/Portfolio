@@ -26,6 +26,7 @@ const randomColor = () => {
 };
 
 class Falling {
+    intersectionObserver: IntersectionObserver;
     renderer: THREE.WebGLRenderer;
     camera: THREE.OrthographicCamera;
     scene: THREE.Scene;
@@ -34,6 +35,20 @@ class Falling {
 
     constructor(canvas: HTMLCanvasElement, width: number, height: number) {
         // Renderer
+        this.intersectionObserver = new IntersectionObserver(
+            (entries, observer) => {
+                for (let i = 0; i < entries.length; i++) {
+                    if (entries[i].isIntersecting) {
+                        this.render();
+                        observer.disconnect();
+                    }
+                }
+            },
+            {
+                threshold: 0.8,
+            },
+        );
+        this.intersectionObserver.observe(canvas);
         this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
         this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
@@ -148,7 +163,7 @@ class Falling {
         }
     }
 
-    render(t: number = 0) {
+    render() {
         this.world.step();
         this.update();
         this.renderer.render(this.scene, this.camera);
@@ -188,30 +203,17 @@ export const FallingTech = () => {
         window.addEventListener("resize", handleResize);
         ref.current.addEventListener("pointerdown", handlePointerDown);
 
-        const ctx = gsap.context(() => {
-            gsap.to(
-                { n: 0 },
-                {
-                    n: 1,
-                    duration: 0.1,
-                    scrollTrigger: {
-                        trigger: container.current,
-                        start: "center center",
-                    },
-                    onStart: () => falling.render(),
-                },
-            );
-        });
-
         return () => {
             window.removeEventListener("resize", handleResize);
             ref.current?.removeEventListener("pointerdown", handlePointerDown);
-            ctx.kill();
         };
     }, []);
 
     return (
         <div ref={container} className="relative aspect-video w-full bg-none">
+            <p className="absolute left-0 top-0 z-10 p-1 text-2xs opacity-10">
+                Click Me
+            </p>
             <canvas ref={ref} className="absolute inset-0" />
         </div>
     );
