@@ -61,12 +61,11 @@ export const technologies = [
     "c#",
     "dotnet",
     "tailwind",
-    "tanstack query",
+    "tanstack",
     "azure",
     "cloudflare",
     "vhdl",
     "cpld",
-    "xilinx ise",
     "c++",
     "opencv",
     "abb",
@@ -75,12 +74,12 @@ export const technologies = [
     "java",
     "tesseract ocr",
     "react",
+    "react native",
     "react three fiber",
     "zig",
     "python",
     "fastapi",
     "expo",
-    "react native",
 ] as const;
 
 export type Technology = (typeof technologies)[number];
@@ -97,16 +96,15 @@ export const getTechName = (tech: Technology) => {
     else if (tech === "c#") return "C#";
     else if (tech === "dotnet") return ".NET";
     else if (tech === "tailwind") return "Tailwind";
-    else if (tech === "tanstack query") return "TanStack Query";
+    else if (tech === "tanstack") return "TanStack";
     else if (tech === "azure") return "Azure";
     else if (tech === "cloudflare") return "Cloudflare";
     else if (tech === "vhdl") return "VHDL";
     else if (tech === "cpld") return "CPLD";
-    else if (tech === "xilinx ise") return "Xilinx ISE";
     else if (tech === "c++") return "C++";
     else if (tech === "opencv") return "OpenCV";
     else if (tech === "abb") return "ABB Robotics";
-    else if (tech === "rapid") return "ADD RAPID";
+    else if (tech === "rapid") return "ABB RAPID";
     else if (tech === "matlab") return "MATLAB";
     else if (tech === "java") return "Java";
     else if (tech === "tesseract ocr") return "Tesseract OCR";

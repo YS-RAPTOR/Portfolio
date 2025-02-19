@@ -3,7 +3,7 @@
     "description": "TODO",
     "image": "assets/TODO.jpg",
     "fields": ["mechatronics", "software", "electrical"],
-    "tech": ["vhdl", "cpld", "xilinx ise"],
+    "tech": ["vhdl", "cpld"],
     "done": true,
     "github": "https://github.com/YS-RAPTOR/TrafficLightProject",
     "link": "TODO"
