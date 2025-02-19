@@ -95,7 +95,7 @@ export const getTechName = (tech: Technology) => {
     else if (tech === "pid") return "PID";
     else if (tech === "c#") return "C#";
     else if (tech === "dotnet") return ".NET";
-    else if (tech === "tailwind") return "Tailwind";
+    else if (tech === "tailwind") return "TailwindCSS";
     else if (tech === "tanstack") return "TanStack";
     else if (tech === "azure") return "Azure";
     else if (tech === "cloudflare") return "Cloudflare";
@@ -115,6 +115,12 @@ export const getTechName = (tech: Technology) => {
     else if (tech === "fastapi") return "FastAPI";
     else if (tech === "expo") return "Expo";
     else if (tech === "react native") return "React Native";
-
     assetUnreachable(tech);
+};
+
+export const getTechSVGPath = (tech: Technology) => {
+    if (tech === "abb" || tech === "rapid") return "/Tech/ABB.svg";
+    else if (tech === "dotnet") return "/Tech/dotnet.svg";
+    else if (tech === "c#") return "/Tech/CSharp.svg";
+    else return `/Tech/${getTechName(tech)}.svg`;
 };

@@ -13,3 +13,17 @@ export default defineConfig({
     integrations: [tailwind(), react()],
 });
 
+// Ensure all svg files are present
+// @ts-ignore
+import fs from "fs";
+// @ts-ignore
+import path from "path";
+import { technologies, getTechSVGPath } from "./src/utils/lib";
+
+const publicDir = path.resolve("./public/");
+
+for (const tech of technologies) {
+    if (!fs.existsSync(path.join(publicDir, getTechSVGPath(tech)))) {
+        throw new Error(`Missing required image: ${tech}`);
+    }
+}
