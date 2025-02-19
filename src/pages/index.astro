@@ -6,12 +6,20 @@ import { HeroHeader } from "../components/HeroHeader.tsx";
 import { Projects } from "../components/Projects.tsx";
 import { ProjectsHeader } from "../components/ProjectsHeader.tsx";
 import { FallingTech } from "../components/FallingTech.tsx";
+import { Image } from "astro:assets";
 
 import { getCollection } from "astro:content";
 
 const projects = (await getCollection("projects", ({ data }) => data.done)).map(
     (p) => p.data,
 );
+
+// NOTE: Copy paste the output of this code into the children of the Projects component
+// projects.forEach((p, i) => {
+//     console.log(
+//         `<Image src={projects[${i}].image} alt={projects[${i}].title} slot="Image: ${p.title}" />`,
+//     );
+// });
 ---
 
 <Base>
@@ -51,7 +59,48 @@ const projects = (await getCollection("projects", ({ data }) => data.done)).map(
         <ProjectsHeader client:load />
         <div class="w-full border-b"></div>
         <!-- @ts-ignore -->
-        <Projects projects={projects} client:load />
+        <Projects projects={projects} client:load>
+            <Image
+                src={projects[0].image}
+                alt={projects[0].title}
+                slot={"Image: Arduino BODMAS Calculator"}
+            />
+            <Image
+                src={projects[1].image}
+                alt={projects[1].title}
+                slot={"Image: Gearbox"}
+            />
+            <Image
+                src={projects[2].image}
+                alt={projects[2].title}
+                slot={"Image: Theme Journal App"}
+            />
+            <Image
+                src={projects[3].image}
+                alt={projects[3].title}
+                slot={"Image: Caffe Loyalty Program"}
+            />
+            <Image
+                src={projects[4].image}
+                alt={projects[4].title}
+                slot={"Image: Pick & Place Robot"}
+            />
+            <Image
+                src={projects[5].image}
+                alt={projects[5].title}
+                slot={"Image: Tetris Solver"}
+            />
+            <Image
+                src={projects[6].image}
+                alt={projects[6].title}
+                slot={"Image: Tic Tac Toe Visualizer Robot"}
+            />
+            <Image
+                src={projects[7].image}
+                alt={projects[7].title}
+                slot={"Image: Traffic Light System"}
+            />
+        </Projects>
     </section>
     <section id="About" class="flex h-fit flex-col items-center border-b">
         <div
@@ -81,6 +130,27 @@ const projects = (await getCollection("projects", ({ data }) => data.done)).map(
         <p>LinkedIn</p>
         <p>Gmail</p>
         <p>Discord</p>
+        <p>Github</p>
+        <p>Github</p>
+        <p>Github</p>
+        <p>Github</p>
+        <p>Github</p>
+        <p>Github</p>
+        <p>Github</p>
+        <p>Github</p>
+        <p>Github</p>
+        <p>Github</p>
+        <p>Github</p>
+        <p>Github</p>
+        <p>Github</p>
+        <p>Github</p>
+        <p>Github</p>
+        <p>Github</p>
+        <p>Github</p>
+        <p>Github</p>
+        <p>Github</p>
+        <p>Github</p>
+        <p>Github</p>
         <p>Github</p>
     </section>
 </Base>

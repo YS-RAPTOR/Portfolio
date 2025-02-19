@@ -1,7 +1,7 @@
 {
     "title": "Arduino BODMAS Calculator",
     "description": "TODO",
-    "image": "assets/TODO.jpg",
+    "image": "./Images/TODO.jpg",
     "done": true,
     "tech": ["arduino", "c++"],
     "fields": ["software", "robotics", "mechatronics"],

@@ -1,7 +1,7 @@
 import { gsap } from "gsap";
 import { Flip } from "gsap/dist/Flip";
 import { useGSAP } from "@gsap/react";
-import { useEffect, useRef, useState } from "react";
+import { Children, useEffect, useRef, useState, type ReactNode } from "react";
 import type { CollectionEntry } from "astro:content";
 import { FaGithub } from "react-icons/fa";
 import { FaArrowUpRightFromSquare } from "react-icons/fa6";
@@ -52,7 +52,10 @@ const getNoOfSelected = (projects: State["projects"]) => {
 };
 
 //TODO: Add scroll trigger Maybe
-export const Projects = (props: { projects: ProjectType[] }) => {
+export const Projects = (props: {
+    projects: ProjectType[];
+    [key: string]: any;
+}) => {
     const ref = useRef<HTMLDivElement>(null);
     const selected = useStore((s) => s.selected);
     const [state, setState] = useState<State>({
@@ -132,7 +135,9 @@ export const Projects = (props: { projects: ProjectType[] }) => {
                     project={p.project}
                     isActive={p.selected}
                     key={index}
-                />
+                >
+                    {props[`Image: ${p.project.title}`]}
+                </ProjectView>
             ))}
             <div
                 className={
@@ -146,7 +151,13 @@ export const Projects = (props: { projects: ProjectType[] }) => {
     );
 };
 
-const ProjectView = (props: { project: ProjectType; isActive: boolean }) => {
+const ProjectView = (props: {
+    project: ProjectType;
+    isActive: boolean;
+    children: ReactNode;
+}) => {
+    if (!props.children) throw new Error("No image found for project");
+
     return (
         <div
             className={
@@ -155,7 +166,9 @@ const ProjectView = (props: { project: ProjectType; isActive: boolean }) => {
             }
         >
             <div>
-                <div className="aspect-[1.5] w-full border-b"></div>
+                <div className="aspect-[1.5] w-full overflow-clip border-b">
+                    {props.children}
+                </div>
                 <div className="flex w-full justify-between border-b">
                     <h1 className="px-2 py-1 font-bold">
                         {props.project.title}

@@ -1,7 +1,7 @@
 {
     "title": "PyZi",
     "description": "TODO",
-    "image": "assets/TODO.jpg",
+    "image": "./Images/TODO.jpg",
     "fields": ["fullstack", "software"],
     "tech": ["zig", "python"],
     "done": false,

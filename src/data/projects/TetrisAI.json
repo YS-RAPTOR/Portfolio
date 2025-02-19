@@ -1,7 +1,7 @@
 {
     "title": "Tetris Solver",
     "description": "TODO",
-    "image": "assets/TODO.jpg",
+    "image": "./Images/TODO.jpg",
     "fields": ["software"],
     "tech": ["matlab", "java", "tesseract ocr"],
     "done": true,

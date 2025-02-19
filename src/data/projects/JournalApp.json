@@ -1,7 +1,7 @@
 {
     "title": "Theme Journal App",
     "description": "TODO",
-    "image": "assets/TODO.jpg",
+    "image": "./Images/TODO.jpg",
     "fields": ["fullstack", "software"],
     "tech": [
         "typescript",
