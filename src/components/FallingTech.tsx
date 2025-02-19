@@ -1,11 +1,13 @@
 import { useRef, useEffect } from "react";
 import { gsap } from "gsap";
-import { technologies, getTechName, type Technology } from "../utils/lib.ts";
+import {
+    technologies,
+    getTechSVGPath,
+    type Technology,
+    type SvgData,
+} from "../utils/lib.ts";
 import RAPIER from "@dimforge/rapier2d-compat";
 import * as THREE from "three";
-
-// TODO:
-// Add text/SVG to the blocks
 
 const FallingConstants = {
     VerticalSpacing: 0.2,
@@ -22,13 +24,20 @@ const randomColor = () => {
 };
 
 class Falling {
+    svgCanvas: HTMLCanvasElement;
+    svgs: SvgData[];
     renderer: THREE.WebGLRenderer;
     camera: THREE.OrthographicCamera;
     scene: THREE.Scene;
     world: RAPIER.World;
     objects: { mesh: THREE.Mesh; collider: RAPIER.RigidBody }[] = [];
 
-    constructor(canvas: HTMLCanvasElement, width: number, height: number) {
+    constructor(
+        canvas: HTMLCanvasElement,
+        svgs: SvgData[],
+        width: number,
+        height: number,
+    ) {
         // Intersection Observer
         new IntersectionObserver(
             (entries, observer) => {
@@ -43,6 +52,8 @@ class Falling {
                 threshold: 0.8,
             },
         ).observe(canvas);
+        this.svgs = svgs;
+        this.svgCanvas = document.createElement("canvas");
 
         // Renderer
         this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
@@ -75,7 +86,7 @@ class Falling {
         this.world.createCollider(leftWall);
         this.world.createCollider(rightWall);
 
-        for (let i = 0; i < technologies.length; i++) {
+        for (let i = 0; i < svgs.length; i++) {
             const y =
                 FallingConstants.VerticalStartLocation +
                 i * FallingConstants.VerticalSpacing;
@@ -86,12 +97,16 @@ class Falling {
                 Math.random() * FallingConstants.RotationRange * 2 -
                 FallingConstants.RotationRange;
 
-            this.spawn(technologies[i], { x, y }, rotation);
+            this.spawn(this.svgs[i], { x, y }, rotation);
         }
     }
 
-    spawn(tech: Technology, pos: { x: number; y: number }, rotation: number) {
-        // TODO: Calculate using tech
+    spawn(svg: SvgData, pos: { x: number; y: number }, rotation: number) {
+        // TODO: Load SVG to the blocks
+        // TODO: Calculate width and height based on SVG
+
+        console.log(svg);
+
         const width = 0.3;
         const height = 0.1;
 
@@ -165,9 +180,17 @@ class Falling {
         this.renderer.render(this.scene, this.camera);
         requestAnimationFrame(() => this.render());
     }
+
+    cleanup() {
+        if (this.svgCanvas.parentNode) {
+            this.svgCanvas.parentNode.removeChild(this.svgCanvas);
+        }
+        // @ts-ignore
+        this.svgCanvas = null;
+    }
 }
 
-export const FallingTech = () => {
+export const FallingTech = (props: { svgs: SvgData[] }) => {
     const ref = useRef<HTMLCanvasElement>(null);
     const container = useRef<HTMLDivElement>(null);
 
@@ -175,6 +198,7 @@ export const FallingTech = () => {
         if (!ref.current || !container.current) return;
         const falling = new Falling(
             ref.current,
+            props.svgs,
             container.current.clientWidth,
             container.current.clientHeight,
         );
@@ -202,6 +226,7 @@ export const FallingTech = () => {
         return () => {
             window.removeEventListener("resize", handleResize);
             ref.current?.removeEventListener("pointerdown", handlePointerDown);
+            falling.cleanup();
         };
     }, []);
 

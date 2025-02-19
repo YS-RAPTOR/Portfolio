@@ -1,7 +1,3 @@
----
-import { technologies, getTechSVGPath } from "../utils/lib.ts";
----
-
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
@@ -15,19 +11,6 @@ import { technologies, getTechSVGPath } from "../utils/lib.ts";
             href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
             rel="stylesheet"
         />
-        {
-            technologies.map((tech) => {
-                const path = getTechSVGPath(tech);
-                return (
-                    <link
-                        rel="preload"
-                        href={"/Portfolio" + path}
-                        as="image"
-                        type="image/svg+xml"
-                    />
-                );
-            })
-        }
         <title>Portfolio</title>
     </head>
     <body class="bg-zinc-950 font-roboto text-zinc-50">

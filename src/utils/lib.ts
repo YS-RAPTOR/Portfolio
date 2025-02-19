@@ -124,3 +124,42 @@ export const getTechSVGPath = (tech: Technology) => {
     else if (tech === "c#") return "/Tech/CSharp.svg";
     else return `/Tech/${getTechName(tech)}.svg`;
 };
+
+export type SvgData = {
+    svg: string;
+    width: number;
+    height: number;
+};
+
+import fs from "fs";
+import path from "path";
+import { type ImageMetadata } from "astro";
+
+export const getTechSvgs = async (
+    basePath: string,
+    metadata: Record<
+        string,
+        () => Promise<{
+            default: ImageMetadata;
+        }>
+    >,
+) => {
+    const baseDir = path.resolve(basePath);
+    const result: SvgData[] = [];
+
+    for (let i = 0; i < technologies.length; i++) {
+        const techPath = getTechSVGPath(technologies[i]);
+        const fullPath = path.join(baseDir, techPath);
+        if (!fs.existsSync(fullPath)) {
+            console.error(`Missing SVG: ${techPath}`);
+        } else {
+            const mdata = await metadata[`/${basePath}${techPath}`]();
+            result.push({
+                svg: fs.readFileSync(fullPath, "utf-8"),
+                width: mdata.default.width,
+                height: mdata.default.height,
+            });
+        }
+    }
+    return result;
+};

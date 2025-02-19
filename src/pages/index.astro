@@ -7,8 +7,9 @@ import { Projects } from "../components/Projects.tsx";
 import { ProjectsHeader } from "../components/ProjectsHeader.tsx";
 import { FallingTech } from "../components/FallingTech.tsx";
 import { Image } from "astro:assets";
-
 import { getCollection } from "astro:content";
+import { getTechSvgs } from "../utils/lib.ts";
+import { type ImageMetadata } from "astro";
 
 const projects = (await getCollection("projects", ({ data }) => data.done)).map(
     (p) => p.data,
@@ -20,6 +21,12 @@ const projects = (await getCollection("projects", ({ data }) => data.done)).map(
 //         `<Image src={projects[${i}].image} alt={projects[${i}].title} slot="Image: ${p.title}" />`,
 //     );
 // });
+
+// Svgs
+const svgMetadata = import.meta.glob<{ default: ImageMetadata }>(
+    "/src/assets/Tech/*.svg",
+);
+const techSVGs = await getTechSvgs("src/assets", svgMetadata);
 ---
 
 <Base>
@@ -122,7 +129,8 @@ const projects = (await getCollection("projects", ({ data }) => data.done)).map(
                 Suspendisse nibh ante, eleifend sed pretium sed, porttitor vel
                 urna.
             </p>
-            <FallingTech client:load />
+            <!-- @ts-ignore -->
+            <FallingTech svgs={techSVGs} client:load />
         </div>
     </section>
     <section id="Contact">
