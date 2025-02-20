@@ -807,7 +807,7 @@ export const HeroBackground = () => {
     return (
         <div
             ref={div}
-            className="relative flex h-fit min-h-[80vh] w-full items-center justify-center overflow-clip"
+            className="relative flex h-fit min-h-[80svh] w-full items-center justify-center overflow-clip"
         >
             <canvas ref={canvas} className="absolute"></canvas>
         </div>

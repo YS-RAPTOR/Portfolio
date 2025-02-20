@@ -6,6 +6,7 @@ import { HeroHeader } from "../components/HeroHeader.tsx";
 import { Projects } from "../components/Projects.tsx";
 import { ProjectsHeader } from "../components/ProjectsHeader.tsx";
 import { FallingTech } from "../components/FallingTech.tsx";
+import { Contact } from "../components/Contact.tsx";
 import { Image } from "astro:assets";
 import { getCollection } from "astro:content";
 import { getTechSvgs } from "../utils/lib.ts";
@@ -133,32 +134,9 @@ const techSVGs = await getTechSvgs("src/assets", svgMetadata);
             <FallingTech svgs={techSVGs} client:load />
         </div>
     </section>
-    <section id="Contact">
-        <h1>Reach out to me</h1>
-        <p>LinkedIn</p>
-        <p>Gmail</p>
-        <p>Discord</p>
-        <p>Github</p>
-        <p>Github</p>
-        <p>Github</p>
-        <p>Github</p>
-        <p>Github</p>
-        <p>Github</p>
-        <p>Github</p>
-        <p>Github</p>
-        <p>Github</p>
-        <p>Github</p>
-        <p>Github</p>
-        <p>Github</p>
-        <p>Github</p>
-        <p>Github</p>
-        <p>Github</p>
-        <p>Github</p>
-        <p>Github</p>
-        <p>Github</p>
-        <p>Github</p>
-        <p>Github</p>
-        <p>Github</p>
-        <p>Github</p>
+    <section id="Contact" class="flex justify-center border-b">
+        <div class="flex aspect-video w-full border-x md:w-2/3">
+            <Contact client:load />
+        </div>
     </section>
 </Base>

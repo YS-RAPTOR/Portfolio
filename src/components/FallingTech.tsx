@@ -1,11 +1,5 @@
 import { useRef, useEffect } from "react";
-import { gsap } from "gsap";
-import {
-    technologies,
-    getTechSVGPath,
-    type Technology,
-    type SvgData,
-} from "../utils/lib.ts";
+import { type SvgData } from "../utils/lib.ts";
 import RAPIER from "@dimforge/rapier2d-compat";
 import * as THREE from "three";
 
