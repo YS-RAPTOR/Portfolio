@@ -50,36 +50,36 @@ export const getJobColor = (job: JobType) => {
 };
 
 export const technologies = [
-    "typescript",
-    "solidworks",
-    "arduino",
-    "laser cutter",
-    "3d printing",
-    "ni",
-    "labview",
-    "pid",
-    "c#",
     "dotnet",
-    "tailwind",
-    "tanstack",
-    "azure",
-    "cloudflare",
-    "vhdl",
-    "cpld",
+    "ni",
     "c++",
-    "opencv",
     "abb",
-    "rapid",
-    "matlab",
-    "java",
-    "tesseract ocr",
-    "react",
+    "c#",
+    "expo",
     "react native",
     "react three fiber",
+    "react",
+    "rapid",
     "zig",
+    "tailwind",
+    "typescript",
+    "solidworks",
+    "3d printing",
+    "tesseract ocr",
+    "cloudflare",
+    "java",
+    "labview",
+    "pid",
+    "cpld",
+    "matlab",
     "python",
+    "tanstack",
+    "azure",
+    "arduino",
+    "vhdl",
+    "opencv",
+    "laser cutter",
     "fastapi",
-    "expo",
 ] as const;
 
 export type Technology = (typeof technologies)[number];
@@ -87,13 +87,14 @@ export type Technology = (typeof technologies)[number];
 export const getTechName = (tech: Technology) => {
     if (tech === "typescript") return "TypeScript";
     else if (tech === "solidworks") return "SolidWorks";
-    else if (tech === "arduino") return "Arduino";
-    else if (tech === "laser cutter") return "Laser Cutter";
-    else if (tech === "3d printing") return "3D Printing";
     else if (tech === "ni") return "NI";
+    else if (tech === "laser cutter") return "Laser Cutter";
+    else if (tech === "java") return "Java";
     else if (tech === "labview") return "LabView";
     else if (tech === "pid") return "PID";
     else if (tech === "c#") return "C#";
+    else if (tech === "3d printing") return "3D Printing";
+    else if (tech === "arduino") return "Arduino";
     else if (tech === "dotnet") return ".NET";
     else if (tech === "tailwind") return "TailwindCSS";
     else if (tech === "tanstack") return "TanStack";
@@ -106,7 +107,6 @@ export const getTechName = (tech: Technology) => {
     else if (tech === "abb") return "ABB Robotics";
     else if (tech === "rapid") return "ABB RAPID";
     else if (tech === "matlab") return "MATLAB";
-    else if (tech === "java") return "Java";
     else if (tech === "tesseract ocr") return "Tesseract OCR";
     else if (tech === "react") return "React";
     else if (tech === "react three fiber") return "React Three Fiber";
