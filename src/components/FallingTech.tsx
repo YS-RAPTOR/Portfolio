@@ -83,16 +83,16 @@ class Falling {
         const gravity = { x: 0.0, y: -0.8 };
         this.world = new RAPIER.World(gravity);
 
-        const floor = RAPIER.ColliderDesc.cuboid(10, 0.1).setTranslation(
+        const floor = RAPIER.ColliderDesc.cuboid(1000, 1000).setTranslation(
             0,
-            -1.1,
+            -1001,
         );
-        const leftWall = RAPIER.ColliderDesc.cuboid(0.1, 100).setTranslation(
-            -1.1,
+        const leftWall = RAPIER.ColliderDesc.cuboid(1000, 1000).setTranslation(
+            -1001,
             0,
         );
-        const rightWall = RAPIER.ColliderDesc.cuboid(0.1, 100).setTranslation(
-            1.1,
+        const rightWall = RAPIER.ColliderDesc.cuboid(1000, 1000).setTranslation(
+            1001,
             0,
         );
 
