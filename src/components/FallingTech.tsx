@@ -24,6 +24,16 @@ const randomColor = () => {
     return new THREE.Color(Math.random(), Math.random(), Math.random());
 };
 
+const checkEqual = (a: number, b: number, percentage: number = 0.1) => {
+    const absDiff = Math.abs(a - b);
+    const average = (Math.abs(a) + Math.abs(b)) / 2;
+
+    if (average === 0) return absDiff < 1e-9;
+
+    const relativeDiff = absDiff / average;
+    return relativeDiff < percentage;
+};
+
 type SVG = SvgData & {
     widthPx: number;
     heightPx: number;
@@ -170,8 +180,6 @@ class Falling {
     }
 
     spawn(svg: SvgData, pos: { x: number; y: number }, rotation: number) {
-        // TODO: SVG updating texture when the size changes
-
         const { widthPx, heightPx, widthThree, heightThree } =
             this.getSvgDim(svg);
 
@@ -282,6 +290,36 @@ class Falling {
         this.world.step();
         this.update();
         this.renderer.render(this.scene, this.camera);
+
+        for (let i = 0; i < this.objects.length; i++) {
+            const { svg, mesh } = this.objects[i];
+
+            if (
+                !checkEqual(
+                    svg.widthPx,
+                    // @ts-ignore
+                    mesh.material.map.source.data.width,
+                    0.01,
+                ) ||
+                !checkEqual(
+                    svg.heightPx,
+                    // @ts-ignore
+                    mesh.material.map.source.data.height,
+                    0.01,
+                )
+            ) {
+                this.svgToTexture(svg)
+                    .then((texture) => {
+                        // @ts-ignore
+                        mesh.material.map = texture;
+                    })
+                    .catch((err) => {
+                        console.error("Failed to update Texture: ", err);
+                    });
+                break;
+            }
+        }
+
         requestAnimationFrame(() => this.render());
     }
 }
