@@ -131,3 +131,19 @@ export const Contact = () => {
 
     return <ContactSvg ref={ref} />;
 };
+
+// MAIL GRADIENT
+// background: rgb(197,33,31);
+// background: linear-gradient(90deg, rgba(197,33,31,1) 0%, rgba(234,66,53,1) 25%, rgba(250,189,3,1) 50%, rgba(52,168,83,1) 75%, rgba(66,134,245,1) 100%);
+
+// LINKEDIN GRADIENT
+// background: rgb(0,119,181);
+// background: linear-gradient(90deg, rgba(0,119,181,1) 0%, rgba(207,237,251,1) 80%, rgba(255,255,255,1) 100%);
+
+// DISCORD GRADIENT
+// background: rgb(88,101,242);
+// background: linear-gradient(90deg, rgba(88,101,242,1) 0%, rgba(26,27,30,1) 100%);
+
+// GITHUB GRADIENT
+// background: rgb(130,80,223);
+// background: linear-gradient(90deg, rgba(130,80,223,1) 0%, rgba(0,10,255,1) 30%, rgba(13,17,23,1) 100%);
