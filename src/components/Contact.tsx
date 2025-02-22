@@ -5,92 +5,105 @@ import { useGSAP } from "@gsap/react";
 
 const startingAnimation = (tl: gsap.core.Timeline) => {
     const durationMultiplier = 0.0025;
-    const durationMax = 1000 * durationMultiplier;
+    // const durationMultiplier = 0.00025;
     const ease = "power1.out";
 
-    tl.fromTo(
-        "#G-1>.trace",
-        { strokeDasharray: 600, strokeDashoffset: -600 },
-        {
-            duration: durationMultiplier * 600,
-            strokeDashoffset: 0,
-            ease: ease,
-        },
-        durationMax - durationMultiplier * 600,
+    const negArray: SVGPathElement[] = gsap.utils.toArray(
+        "#G-1>.trace, #G-2>.trace, #L>.trace, #D-1>.trace, #D-2>.trace, #M-1>.trace, #M-2>.trace",
     );
-    tl.fromTo(
-        "#G-2>.trace",
-        { strokeDasharray: 450, strokeDashoffset: -450 },
-        {
-            duration: durationMultiplier * 450,
-            strokeDashoffset: 0,
-            ease: ease,
-        },
-        durationMax - durationMultiplier * 450,
-    );
-    tl.fromTo(
-        "#L>.trace",
-        { strokeDasharray: 200, strokeDashoffset: -200 },
-        {
-            duration: durationMultiplier * 200,
-            strokeDashoffset: 0,
-            ease: ease,
-        },
-        durationMax - durationMultiplier * 200,
-    );
-    tl.fromTo(
-        "#D-1>.trace",
-        { strokeDasharray: 700, strokeDashoffset: -700 },
-        {
-            duration: durationMultiplier * 700,
-            strokeDashoffset: 0,
-            ease: ease,
-        },
-        durationMax - durationMultiplier * 700,
-    );
-    tl.fromTo(
-        "#D-2>.trace",
-        { strokeDasharray: 150, strokeDashoffset: -150 },
-        {
-            duration: durationMultiplier * 150,
-            strokeDashoffset: 0,
-            ease: ease,
-        },
-        durationMax - durationMultiplier * 150,
-    );
-    tl.fromTo(
-        "#M-1>.trace",
-        { strokeDasharray: 900, strokeDashoffset: -900 },
-        {
-            duration: durationMultiplier * 900,
-            strokeDashoffset: 0,
-            ease: ease,
-        },
-        durationMax - durationMultiplier * 900,
-    );
-    tl.fromTo(
-        "#M-2>.trace",
-        { strokeDasharray: 450, strokeDashoffset: -450 },
-        {
-            duration: durationMultiplier * 450,
-            strokeDashoffset: 0,
-            ease: ease,
-        },
-        durationMax - durationMultiplier * 450,
-    );
-    tl.fromTo(
-        "#ET>.trace",
-        { strokeDasharray: 450, strokeDashoffset: 450 },
-        {
-            duration: durationMultiplier * 450,
-            strokeDashoffset: 0,
-            ease: ease,
-        },
-        durationMax - durationMultiplier * 450,
-    );
+    const posArray: SVGPathElement[] = gsap.utils.toArray("#ET>.trace");
+
+    const durationMaxNeg =
+        Math.max(...negArray.map((s) => s.getTotalLength())) *
+        durationMultiplier;
+    const durationMaxPos =
+        Math.max(...posArray.map((s) => s.getTotalLength())) *
+        durationMultiplier;
+    const durationMax = Math.max(durationMaxPos, durationMaxNeg);
+
+    for (let i = 0; i < negArray.length; i++) {
+        const length = negArray[i].getTotalLength();
+
+        tl.fromTo(
+            negArray[i],
+            {
+                strokeDasharray: length,
+                strokeDashoffset: -length,
+            },
+            {
+                duration: durationMultiplier * length,
+                ease: ease,
+                strokeDashoffset: 0,
+            },
+            durationMax - durationMultiplier * length,
+        );
+    }
+
+    for (let i = 0; i < posArray.length; i++) {
+        const length = posArray[i].getTotalLength();
+
+        tl.fromTo(
+            posArray[i],
+            {
+                strokeDasharray: length,
+                strokeDashoffset: length,
+            },
+            {
+                duration: durationMultiplier * length,
+                ease: ease,
+                strokeDashoffset: 0,
+            },
+            durationMax - durationMultiplier * length,
+        );
+    }
 };
 
-const repeatingAnimation = (tl: gsap.core.Timeline) => {};
+const pulseAnimation = (
+    tl: gsap.core.Timeline,
+    selector: string,
+    stroke: string,
+) => {
+    const pulses: SVGPathElement[] = gsap.utils.toArray(selector);
+    const pulseLength = 25;
+
+    for (let i = 0; i << pulses.length; i++) {
+        const path = pulses[i];
+        const pathLength = path.getTotalLength();
+
+        gsap.set(path, {
+            strokeDasharray: `${pulseLength}px, ${pathLength}px`,
+            strokeDashoffset: pulseLength,
+            stroke: stroke,
+        });
+
+        tl.t;
+    }
+};
+
+const repeatingAnimation = (tl: gsap.core.Timeline) => {
+    const allPulses: SVGPathElement[] = gsap.utils.toArray(".pulse");
+    const pulseLength = 50;
+
+    for (let i = 0; i < allPulses.length; i++) {
+        const l = allPulses[i].getTotalLength();
+
+        gsap.set(allPulses[i], {
+            strokeDasharray: `${pulseLength}px, ${l}px`,
+            strokeDashoffset: pulseLength,
+            stroke: "rgba(0,0,0,0)",
+        });
+
+        // tl.to(
+        //     allPulses[i],
+        //     {
+        //         strokeDashoffset: l + pulseLength * 2,
+        //         duration: 1,
+        //         ease: "none",
+        //     },
+        //     0,
+        // );
+    }
+};
 
 export const Contact = () => {
     const ref = useRef<SVGSVGElement>(null);
