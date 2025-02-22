@@ -14,10 +14,6 @@ const FallingConstants = {
     FlipBounds: Math.PI / 2 + 0.1,
 };
 
-const randomColor = () => {
-    return new THREE.Color(Math.random(), Math.random(), Math.random());
-};
-
 const checkEqual = (a: number, b: number, percentage: number = 0.1) => {
     const absDiff = Math.abs(a - b);
     const average = (Math.abs(a) + Math.abs(b)) / 2;
@@ -154,7 +150,7 @@ class Falling {
                 canvas.width = svg.widthPx;
                 canvas.height = svg.heightPx;
                 const ctx = canvas.getContext("2d");
-                ctx?.drawImage(img, 0, 0, svg.widthPx, svg.heightPx);
+                ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
 
                 const texture = new THREE.CanvasTexture(canvas);
                 texture.colorSpace = THREE.SRGBColorSpace;
