@@ -228,6 +228,7 @@ export const ContactSvg = (props: { ref: RefObject<SVGSVGElement | null> }) => {
                             stroke: rgba(250, 250, 250, 0);
                             stroke-linejoin: round;
                             stroke-width: 2px;
+                            stroke-linecap: round;
                         }
                     `}
                 </style>
