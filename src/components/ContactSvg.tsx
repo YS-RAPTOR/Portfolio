@@ -310,6 +310,7 @@ export const ContactSvg = (props: { ref: RefObject<SVGSVGElement | null> }) => {
                         }
                         .board {
                             fill: #222;
+                            transition: fill 0.3s ease;
                         }
                         .notch {
                             fill: #fff;
@@ -327,6 +328,11 @@ export const ContactSvg = (props: { ref: RefObject<SVGSVGElement | null> }) => {
                             stroke-linejoin: round;
                             stroke-width: 2px;
                             stroke-linecap: round;
+                        }
+                        #Mail:hover,#Linkedin:hover,#Github:hover,#Discord:hover {
+                            .board {
+                                fill: #111;
+                            }
                         }
                     `}
                 </style>

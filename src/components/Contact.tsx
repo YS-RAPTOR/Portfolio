@@ -249,8 +249,7 @@ const repeatingAnimation = (tl: gsap.core.Timeline) => {
 
 const createHoverAnimation = (group: SVGGElement) => {
     const shineElement = group.querySelector(".shine") as SVGRectElement;
-    const icon = group.querySelector(".text") as SVGPathElement;
-    const iconBbox = icon.getBBox();
+    const iconBbox = (group.querySelector(".text") as SVGPathElement).getBBox();
 
     const data = {
         tl: gsap.timeline({
@@ -282,25 +281,6 @@ const createHoverAnimation = (group: SVGGElement) => {
     const y1 = cy - iconBbox.height * scale;
     const x2 = cx - iconBbox.width * scale;
     const y2 = cy + iconBbox.height * scale;
-
-    // data.tl.to(
-    //     icon,
-    //     {
-    //         fill: "#fff",
-    //         duration: 1,
-    //         ease: "sine.inOut",
-    //     },
-    //     0,
-    // );
-    // data.tl.to(
-    //     icon,
-    //     {
-    //         fill: "#c6c6c6",
-    //         duration: 1,
-    //         ease: "sine.inOut",
-    //     },
-    //     1,
-    // );
 
     data.tl.fromTo(
         shineElement,
