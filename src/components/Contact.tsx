@@ -2,14 +2,13 @@ import { useRef } from "react";
 import { ContactSvg } from "./ContactSvg";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
-
-//TODO: Test discord
+import { element } from "three/src/nodes/TSL.js";
 
 type GradientDefinition = (string | { color: string; stop: number })[];
 
 const ContactConstants = {
     start: {
-        durationMultiplier: 0.00025, // 0.0025
+        durationMultiplier: 0.0025,
         ease: "power1.out",
     },
     idle: {
@@ -22,7 +21,7 @@ const ContactConstants = {
             "#ea4235",
             "#fabd03",
             "#34a853",
-            "#000000",
+            "#4081ec",
         ] as GradientDefinition,
         linkedin: [
             { color: "#0077b5", stop: 0 },
@@ -248,6 +247,83 @@ const repeatingAnimation = (tl: gsap.core.Timeline) => {
     pulseAnimation(tl, "#ET>.pulse", ["#c6c6c6"], "random", 0, 0.05, 0.005);
 };
 
+const createHoverAnimation = (group: SVGGElement) => {
+    const shineElement = group.querySelector(".shine") as SVGRectElement;
+    const iconBbox = (group.querySelector(".text") as SVGPathElement).getBBox();
+
+    const data = {
+        tl: gsap.timeline({
+            paused: true,
+            onComplete: () => {
+                if (data.repeat) {
+                    data.tl.seek(-1);
+                    data.tl.play();
+                }
+            },
+        }),
+        repeat: false,
+        element: group,
+        onEnter: () => {
+            data.repeat = true;
+            data.tl.restart();
+        },
+        onLeave: () => {
+            data.repeat = false;
+        },
+    };
+
+    const scale = 1.2;
+
+    const cx = iconBbox.x + iconBbox.width / 2;
+    const cy = iconBbox.y + iconBbox.height / 2;
+
+    const x1 = cx + iconBbox.width * scale;
+    const y1 = cy - iconBbox.height * scale;
+    const x2 = cx - iconBbox.width * scale;
+    const y2 = cy + iconBbox.height * scale;
+
+    data.tl.fromTo(
+        shineElement,
+        {
+            attr: {
+                x1: x1 - iconBbox.width * 2,
+                x2: x2 - iconBbox.width * 2,
+                y1: y1,
+                y2: y2,
+            },
+        },
+        {
+            duration: 0.65,
+            ease: "power1.inOut",
+            attr: {
+                x1: x1 + iconBbox.width * 2,
+                x2: x2 + iconBbox.width * 2,
+                y1: y1,
+                y2: y2,
+            },
+        },
+    );
+
+    // data.tl.fromTo(
+    //     element,
+    //     {
+    //         attr: {
+    //             x1: startX1.toString(),
+    //             x2: startX2.toString(),
+    //         },
+    //     },
+    //     {
+    //         duration: 0.5,
+    //         ease: "power1.inOut",
+    //         attr: {
+    //             x1: endX1.toString(),
+    //             x2: endX2.toString(),
+    //         },
+    //     },
+    // );
+    return data;
+};
+
 export const Contact = () => {
     const ref = useRef<SVGSVGElement>(null);
 
@@ -281,6 +357,62 @@ export const Contact = () => {
                 },
                 { threshold: 0.8 },
             ).observe(ref.current);
+
+            const mail = createHoverAnimation(
+                ref.current.querySelector("#Mail") as SVGGElement,
+            );
+            mail.element.addEventListener("pointerenter", mail.onEnter);
+            mail.element.addEventListener("pointerleave", mail.onLeave);
+
+            const linkedin = createHoverAnimation(
+                ref.current.querySelector("#Linkedin") as SVGGElement,
+            );
+            linkedin.element.addEventListener("pointerenter", linkedin.onEnter);
+            linkedin.element.addEventListener("pointerleave", linkedin.onLeave);
+
+            const github = createHoverAnimation(
+                ref.current.querySelector("#Github") as SVGGElement,
+            );
+            github.element.addEventListener("pointerenter", github.onEnter);
+            github.element.addEventListener("pointerleave", github.onLeave);
+
+            const discord = createHoverAnimation(
+                ref.current.querySelector("#Discord") as SVGGElement,
+            );
+            discord.element.addEventListener("pointerenter", discord.onEnter);
+            discord.element.addEventListener("pointerleave", discord.onLeave);
+
+            return () => {
+                mail.element.removeEventListener("pointerenter", mail.onEnter);
+                mail.element.removeEventListener("pointerleave", mail.onLeave);
+
+                linkedin.element.removeEventListener(
+                    "pointerenter",
+                    linkedin.onEnter,
+                );
+                linkedin.element.removeEventListener(
+                    "pointerleave",
+                    linkedin.onLeave,
+                );
+
+                github.element.removeEventListener(
+                    "pointerenter",
+                    github.onEnter,
+                );
+                github.element.removeEventListener(
+                    "pointerleave",
+                    github.onLeave,
+                );
+
+                discord.element.removeEventListener(
+                    "pointerenter",
+                    discord.onEnter,
+                );
+                discord.element.removeEventListener(
+                    "pointerleave",
+                    discord.onLeave,
+                );
+            };
         },
         { scope: ref },
     );

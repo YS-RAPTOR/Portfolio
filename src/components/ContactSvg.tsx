@@ -200,54 +200,50 @@ export const ContactSvg = (props: { ref: RefObject<SVGSVGElement | null> }) => {
                     <stop offset=".92" stopColor="#525252" stopOpacity=".05" />
                     <stop offset="1" stopOpacity=".05" />
                 </radialGradient>
-                <linearGradient id="MailGradient" x1="1" y1="1" x2="0" y2="0">
-                    <stop offset="0" stopColor="transparent"></stop>
-                    <stop offset="0.2" stopColor="transparent"></stop>
-                    <stop offset="0.25" stopColor="#4081ec" />
-                    <stop offset="0.375" stopColor="#34a853" />
-                    <stop offset="0.5" stopColor="#fabd03" />
-                    <stop offset="0.625" stopColor="#ea4235" />
-                    <stop offset="0.75" stopColor="#c5211f" />
-                    <stop offset="0.8" stopColor="transparent"></stop>
-                    <stop offset="1" stopColor="transparent"></stop>
+                <linearGradient
+                    id="MailGradient"
+                    x1="0.4"
+                    y1="0.4"
+                    x2="0.6"
+                    y2="0.6"
+                >
+                    <stop offset="0" stopColor="#c6c6c6"></stop>
+                    <stop offset="0.2" stopColor="#fabd03" />
+                    <stop offset="0.666" stopColor="#ea4235" />
+                    <stop offset="1" stopColor="#c5211f" />
                 </linearGradient>
                 <linearGradient
                     id="LinkedinGradient"
-                    x1="1"
-                    y1="1"
-                    x2="0"
-                    y2="0"
+                    x1="0.41"
+                    y1="0.41"
+                    x2="0.6"
+                    y2="0.6"
                 >
-                    <stop offset="0" stopColor="transparent"></stop>
-                    <stop offset="0.2" stopColor="transparent"></stop>
-                    <stop offset="0.25" stopColor="#ffffff"></stop>
-                    <stop offset="0.5" stopColor="#cfedfb"></stop>
-                    <stop offset="0.75" stopColor="#0077b5"></stop>
-                    <stop offset="0.8" stopColor="transparent"></stop>
-                    <stop offset="1" stopColor="transparent"></stop>
+                    <stop offset="0" stopColor="#c6c6c6"></stop>
+                    <stop offset="0.2" stopColor="#cfedfb"></stop>
+                    <stop offset="1" stopColor="#0077b5"></stop>
                 </linearGradient>
                 <linearGradient
                     id="DiscordGradient"
-                    x1="1"
-                    y1="1"
-                    x2="0"
-                    y2="0"
+                    x1="0.42"
+                    y1="0.42"
+                    x2="0.58"
+                    y2="0.58"
                 >
-                    <stop offset="0" stopColor="transparent"></stop>
-                    <stop offset="0.2" stopColor="transparent"></stop>
-                    <stop offset="0.25" stopColor="#1a1b1e"></stop>
-                    <stop offset="0.75" stopColor="#5865f2"></stop>
-                    <stop offset="0.8" stopColor="transparent"></stop>
-                    <stop offset="1" stopColor="transparent"></stop>
+                    <stop offset="0" stopColor="#c6c6c6"></stop>
+                    <stop offset="0.4" stopColor="#5865f2"></stop>
+                    <stop offset="1" stopColor="#393c41"></stop>
                 </linearGradient>
-                <linearGradient id="GithubGradient" x1="1" y1="1" x2="0" y2="0">
-                    <stop offset="0" stopColor="transparent"></stop>
-                    <stop offset="0.2" stopColor="transparent"></stop>
-                    <stop offset="0.25" stopColor="#0d1117"></stop>
-                    <stop offset="0.5" stopColor="#000aff"></stop>
-                    <stop offset="0.75" stopColor="#8250df"></stop>
-                    <stop offset="0.8" stopColor="transparent"></stop>
-                    <stop offset="1" stopColor="transparent"></stop>
+                <linearGradient
+                    id="GithubGradient"
+                    x1="0.42"
+                    y1="0.42"
+                    x2="0.58"
+                    y2="0.58"
+                >
+                    <stop offset="0" stopColor="#c6c6c6"></stop>
+                    <stop offset="0.4" stopColor="#8250df"></stop>
+                    <stop offset="1" stopColor="#000aff"></stop>
                 </linearGradient>
 
                 <path
@@ -1239,13 +1235,11 @@ export const ContactSvg = (props: { ref: RefObject<SVGSVGElement | null> }) => {
                             className="notch"
                         />
                         <use href="#GithubIcon" className="text" />
-                        <rect
+                        <line
                             className="shine"
-                            x="1564.1031"
-                            y="565"
-                            width="71.7938"
-                            height="70"
-                            fill="url(#GithubGradient)"
+                            strokeWidth="40"
+                            strokeLinecap="square"
+                            stroke="url(#GithubGradient)"
                             mask="url(#GithubMask)"
                         />
                     </g>
@@ -1318,13 +1312,11 @@ export const ContactSvg = (props: { ref: RefObject<SVGSVGElement | null> }) => {
                             className="notch"
                         />
                         <use href="#DiscordIcon" className="text" />
-                        <rect
+                        <line
                             className="shine"
-                            fill="url(#DiscordGradient)"
-                            x="1060.62485"
-                            y="170"
-                            width="71.7938"
-                            height="60"
+                            strokeWidth="40"
+                            strokeLinecap="square"
+                            stroke="url(#DiscordGradient)"
                             mask="url(#DiscordMask)"
                         />
                     </g>
@@ -1393,13 +1385,11 @@ export const ContactSvg = (props: { ref: RefObject<SVGSVGElement | null> }) => {
                             className="notch"
                         />
                         <use href="#MailIcon" className="text" />
-                        <rect
+                        <line
                             className="shine"
-                            fill="url(#MailGradient)"
-                            x="360"
-                            y="270"
-                            width="80"
-                            height="60"
+                            strokeWidth="40"
+                            strokeLinecap="square"
+                            stroke="url(#MailGradient)"
                             mask="url(#MailMask)"
                         />
                     </g>
@@ -1466,13 +1456,11 @@ export const ContactSvg = (props: { ref: RefObject<SVGSVGElement | null> }) => {
                             className="notch"
                         />
                         <use href="#LinkedinIcon" className="text" />
-                        <rect
+                        <line
                             className="shine"
-                            fill="url(#LinkedinGradient)"
-                            x="897.7178"
-                            y="832.7"
-                            width="151.0138"
-                            height="40"
+                            strokeWidth="40"
+                            strokeLinecap="square"
+                            stroke="url(#LinkedinGradient)"
                             mask="url(#LinkedinMask)"
                         />
                     </g>
