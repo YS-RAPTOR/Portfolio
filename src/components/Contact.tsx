@@ -3,22 +3,103 @@ import { ContactSvg } from "./ContactSvg";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 
-const startingAnimation = (tl: gsap.core.Timeline) => {
-    const durationMultiplier = 0.0025;
-    // const durationMultiplier = 0.00025;
-    const ease = "power1.out";
+type GradientDefinition = (string | { color: string; stop: number })[];
 
+const ContactConstants = {
+    start: {
+        durationMultiplier: 0.00025, // 0.0025
+        ease: "power1.out",
+    },
+    idle: {
+        pulseLength: 25,
+        durationMultiplier: 0.002,
+    },
+    gradients: {
+        mail: [
+            "#c5211f",
+            "#ea4235",
+            "#fabd03",
+            "#34a853",
+            "#000000",
+        ] as GradientDefinition,
+        linkedin: [
+            { color: "#0077b5", stop: 0 },
+            { color: "#cfedfb", stop: 0.8 },
+            { color: "#ffffff", stop: 1 },
+        ] as GradientDefinition,
+        discord: ["#5865f2", "#1a1b1e"] as GradientDefinition,
+        github: [
+            { color: "#8250df", stop: 0 },
+            { color: "#000aff", stop: 0.3 },
+            { color: "#0d1117", stop: 1 },
+        ] as GradientDefinition,
+    },
+};
+
+const getColor = (gradient: GradientDefinition, offset: number) => {
+    if (offset < 0 || offset > 1) {
+        throw new Error("Offset must be between 0 and 1");
+    }
+    if (gradient.length === 0) {
+        throw new Error("Gradient must have at least one color");
+    }
+
+    if (gradient.length === 1) {
+        const color: string =
+            typeof gradient[0] === "object" ? gradient[0].color : gradient[0];
+        return color;
+    }
+
+    const stops: number[] = [];
+
+    if (typeof gradient[0] === "object") {
+        for (let i = 0; i < gradient.length; i++) {
+            const { stop } = gradient[i] as { color: string; stop: number };
+            stops.push(stop);
+        }
+    } else {
+        const step = 1 / (gradient.length - 1);
+        for (let i = 0; i < gradient.length; i++) {
+            stops.push(step * i);
+        }
+    }
+
+    // Check where I am in the gradient
+    for (let i = 1; i < stops.length; i++) {
+        if (offset >= stops[i - 1] && offset <= stops[i]) {
+            const normalizedOffset =
+                (offset - stops[i - 1]) / (stops[i] - stops[i - 1]);
+
+            const color1 =
+                typeof gradient[i - 1] === "string"
+                    ? gradient[i - 1]
+                    : // @ts-ignore
+                      gradient[i - 1].color;
+            const color2 =
+                typeof gradient[i] === "string"
+                    ? gradient[i]
+                    : // @ts-ignore
+                      gradient[i].color;
+
+            return gsap.utils.interpolate(color1, color2, normalizedOffset);
+        }
+    }
+
+    throw new Error("Offset not found in gradient");
+};
+
+const startingAnimation = (tl: gsap.core.Timeline) => {
     const negArray: SVGPathElement[] = gsap.utils.toArray(
-        "#G-1>.trace, #G-2>.trace, #L>.trace, #D-1>.trace, #D-2>.trace, #M-1>.trace, #M-2>.trace",
+        "#G-1>.trace, #G-2>.trace, #L-1>.trace,#L-2>.trace, #D-1>.trace, #D-2>.trace, #M-1>.trace, #M-2>.trace",
     );
     const posArray: SVGPathElement[] = gsap.utils.toArray("#ET>.trace");
 
     const durationMaxNeg =
         Math.max(...negArray.map((s) => s.getTotalLength())) *
-        durationMultiplier;
+        ContactConstants.start.durationMultiplier;
     const durationMaxPos =
         Math.max(...posArray.map((s) => s.getTotalLength())) *
-        durationMultiplier;
+        ContactConstants.start.durationMultiplier;
     const durationMax = Math.max(durationMaxPos, durationMaxNeg);
 
     for (let i = 0; i < negArray.length; i++) {
@@ -31,11 +112,11 @@ const startingAnimation = (tl: gsap.core.Timeline) => {
                 strokeDashoffset: -length,
             },
             {
-                duration: durationMultiplier * length,
-                ease: ease,
+                duration: ContactConstants.start.durationMultiplier * length,
+                ease: ContactConstants.start.ease,
                 strokeDashoffset: 0,
             },
-            durationMax - durationMultiplier * length,
+            durationMax - ContactConstants.start.durationMultiplier * length,
         );
     }
 
@@ -49,11 +130,11 @@ const startingAnimation = (tl: gsap.core.Timeline) => {
                 strokeDashoffset: length,
             },
             {
-                duration: durationMultiplier * length,
-                ease: ease,
+                duration: ContactConstants.start.durationMultiplier * length,
+                ease: ContactConstants.start.ease,
                 strokeDashoffset: 0,
             },
-            durationMax - durationMultiplier * length,
+            durationMax - ContactConstants.start.durationMultiplier * length,
         );
     }
 };
@@ -61,48 +142,116 @@ const startingAnimation = (tl: gsap.core.Timeline) => {
 const pulseAnimation = (
     tl: gsap.core.Timeline,
     selector: string,
-    stroke: string,
+    gradient: GradientDefinition,
+    reverse: boolean | "random",
+    start: number,
+    stagger: number,
+    durationMultiplier: number = ContactConstants.idle.durationMultiplier,
 ) => {
-    const pulses: SVGPathElement[] = gsap.utils.toArray(selector);
-    const pulseLength = 25;
+    let paths = gsap.utils.toArray(selector) as SVGPathElement[];
+    if (reverse === "random") {
+        paths = gsap.utils.shuffle(paths);
+    }
 
-    for (let i = 0; i << pulses.length; i++) {
-        const path = pulses[i];
-        const pathLength = path.getTotalLength();
+    for (let i = 0; i < paths.length; i++) {
+        const pathLength = paths[i].getTotalLength();
+        const stroke = getColor(gradient, i / paths.length);
 
-        gsap.set(path, {
-            strokeDasharray: `${pulseLength}px, ${pathLength}px`,
-            strokeDashoffset: pulseLength,
-            stroke: stroke,
-        });
+        const reversed = reverse === "random" ? Math.random() > 0.5 : reverse;
 
-        tl.t;
+        tl.set(
+            paths[i],
+            {
+                strokeDasharray: `${ContactConstants.idle.pulseLength}px, ${pathLength}px`,
+                strokeDashoffset: reversed
+                    ? pathLength + ContactConstants.idle.pulseLength * 2.1
+                    : ContactConstants.idle.pulseLength,
+                stroke: stroke,
+            },
+            0,
+        );
+
+        tl.to(
+            paths[i],
+            {
+                strokeDashoffset: reversed
+                    ? ContactConstants.idle.pulseLength
+                    : pathLength + ContactConstants.idle.pulseLength * 2.1,
+                duration: durationMultiplier * pathLength,
+                ease: "none",
+            },
+            start + i * stagger,
+        );
     }
 };
 
 const repeatingAnimation = (tl: gsap.core.Timeline) => {
-    const allPulses: SVGPathElement[] = gsap.utils.toArray(".pulse");
-    const pulseLength = 50;
+    pulseAnimation(
+        tl,
+        "#G-1>.pulse",
+        ContactConstants.gradients.github,
+        false,
+        0,
+        0.4,
+    );
+    pulseAnimation(
+        tl,
+        "#G-2>.pulse",
+        ContactConstants.gradients.github,
+        true,
+        1.5,
+        0.25,
+    );
+    pulseAnimation(
+        tl,
+        "#L-1>.pulse",
+        ContactConstants.gradients.linkedin,
+        false,
+        1,
+        0.2,
+    );
+    pulseAnimation(
+        tl,
+        "#L-2>.pulse",
+        ContactConstants.gradients.linkedin,
+        true,
+        1.5,
+        0.2,
+    );
+    pulseAnimation(
+        tl,
+        "#D-1>.pulse",
+        ContactConstants.gradients.discord,
+        false,
+        0.25,
+        0.2,
+    );
 
-    for (let i = 0; i < allPulses.length; i++) {
-        const l = allPulses[i].getTotalLength();
-
-        gsap.set(allPulses[i], {
-            strokeDasharray: `${pulseLength}px, ${l}px`,
-            strokeDashoffset: pulseLength,
-            stroke: "rgba(0,0,0,0)",
-        });
-
-        // tl.to(
-        //     allPulses[i],
-        //     {
-        //         strokeDashoffset: l + pulseLength * 2,
-        //         duration: 1,
-        //         ease: "none",
-        //     },
-        //     0,
-        // );
-    }
+    pulseAnimation(
+        tl,
+        "#D-2>.pulse",
+        ContactConstants.gradients.discord,
+        true,
+        2,
+        0.2,
+    );
+    pulseAnimation(
+        tl,
+        "#M-2>.pulse",
+        ContactConstants.gradients.mail,
+        false,
+        0,
+        0.2,
+    );
+    pulseAnimation(
+        tl,
+        "#M-1>.pulse",
+        ContactConstants.gradients.mail,
+        true,
+        1,
+        0.1,
+    );
+    pulseAnimation(tl, "#ET>.pulse", ["#ffffff"], "random", 0, 0.05, 0.005);
 };
 
 export const Contact = () => {
@@ -114,7 +263,7 @@ export const Contact = () => {
 
             const rtl = gsap.timeline({
                 repeat: -1,
-                repeatDelay: 1,
+                repeatDelay: 0.1,
                 paused: true,
             });
             repeatingAnimation(rtl);
@@ -144,19 +293,3 @@ export const Contact = () => {
 
     return <ContactSvg ref={ref} />;
 };
-
-// MAIL GRADIENT
-// background: rgb(197,33,31);
-// background: linear-gradient(90deg, rgba(197,33,31,1) 0%, rgba(234,66,53,1) 25%, rgba(250,189,3,1) 50%, rgba(52,168,83,1) 75%, rgba(66,134,245,1) 100%);
-
-// LINKEDIN GRADIENT
-// background: rgb(0,119,181);
-// background: linear-gradient(90deg, rgba(0,119,181,1) 0%, rgba(207,237,251,1) 80%, rgba(255,255,255,1) 100%);
-
-// DISCORD GRADIENT
-// background: rgb(88,101,242);
-// background: linear-gradient(90deg, rgba(88,101,242,1) 0%, rgba(26,27,30,1) 100%);
-
-// GITHUB GRADIENT
-// background: rgb(130,80,223);
-// background: linear-gradient(90deg, rgba(130,80,223,1) 0%, rgba(0,10,255,1) 30%, rgba(13,17,23,1) 100%);
