@@ -3,6 +3,8 @@ import { ContactSvg } from "./ContactSvg";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 
+//TODO: Test discord
+
 type GradientDefinition = (string | { color: string; stop: number })[];
 
 const ContactConstants = {
@@ -243,7 +245,7 @@ const repeatingAnimation = (tl: gsap.core.Timeline) => {
         1,
         0.1,
     );
-    pulseAnimation(tl, "#ET>.pulse", ["#ffffff"], "random", 0, 0.05, 0.005);
+    pulseAnimation(tl, "#ET>.pulse", ["#c6c6c6"], "random", 0, 0.05, 0.005);
 };
 
 export const Contact = () => {

@@ -166,7 +166,7 @@ const ProjectView = (props: {
             }
         >
             <div>
-                <div className="aspect-[1.5] w-full overflow-clip border-b p-0.5">
+                <div className="flex aspect-[1.5] w-full items-center justify-center overflow-clip border-b p-0.5">
                     {props.children}
                 </div>
                 <div className="flex w-full justify-between border-b">
