@@ -249,14 +249,15 @@ const repeatingAnimation = (tl: gsap.core.Timeline) => {
 
 const createHoverAnimation = (group: SVGGElement) => {
     const shineElement = group.querySelector(".shine") as SVGRectElement;
-    const iconBbox = (group.querySelector(".text") as SVGPathElement).getBBox();
+    const icon = group.querySelector(".text") as SVGPathElement;
+    const iconBbox = icon.getBBox();
 
     const data = {
         tl: gsap.timeline({
             paused: true,
             onComplete: () => {
                 if (data.repeat) {
-                    data.tl.seek(-1);
+                    data.tl.seek(-0.5);
                     data.tl.play();
                 }
             },
@@ -282,45 +283,48 @@ const createHoverAnimation = (group: SVGGElement) => {
     const x2 = cx - iconBbox.width * scale;
     const y2 = cy + iconBbox.height * scale;
 
+    // data.tl.to(
+    //     icon,
+    //     {
+    //         fill: "#fff",
+    //         duration: 1,
+    //         ease: "sine.inOut",
+    //     },
+    //     0,
+    // );
+    // data.tl.to(
+    //     icon,
+    //     {
+    //         fill: "#c6c6c6",
+    //         duration: 1,
+    //         ease: "sine.inOut",
+    //     },
+    //     1,
+    // );
+
     data.tl.fromTo(
         shineElement,
         {
             attr: {
-                x1: x1 - iconBbox.width * 2,
-                x2: x2 - iconBbox.width * 2,
+                x1: x1 - iconBbox.width * 1.41,
+                x2: x2 - iconBbox.width * 1.41,
                 y1: y1,
                 y2: y2,
             },
         },
         {
-            duration: 0.65,
-            ease: "power1.inOut",
+            duration: 2,
+            ease: "sine.inOut",
             attr: {
-                x1: x1 + iconBbox.width * 2,
-                x2: x2 + iconBbox.width * 2,
+                x1: x1 + iconBbox.width * 1.41,
+                x2: x2 + iconBbox.width * 1.41,
                 y1: y1,
                 y2: y2,
             },
         },
+        0,
     );
 
-    // data.tl.fromTo(
-    //     element,
-    //     {
-    //         attr: {
-    //             x1: startX1.toString(),
-    //             x2: startX2.toString(),
-    //         },
-    //     },
-    //     {
-    //         duration: 0.5,
-    //         ease: "power1.inOut",
-    //         attr: {
-    //             x1: endX1.toString(),
-    //             x2: endX2.toString(),
-    //         },
-    //     },
-    // );
     return data;
 };
 

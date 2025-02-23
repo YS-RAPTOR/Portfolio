@@ -207,10 +207,9 @@ export const ContactSvg = (props: { ref: RefObject<SVGSVGElement | null> }) => {
                     x2="0.6"
                     y2="0.6"
                 >
-                    <stop offset="0" stopColor="#c6c6c6"></stop>
-                    <stop offset="0.2" stopColor="#fabd03" />
-                    <stop offset="0.666" stopColor="#ea4235" />
-                    <stop offset="1" stopColor="#c5211f" />
+                    <stop offset="0" stopOpacity={0} stopColor="#fabd03" />
+                    <stop offset="0.5" stopOpacity={0.2} stopColor="#fabd03" />
+                    <stop offset="1" stopOpacity={0} stopColor="#fabd03" />
                 </linearGradient>
                 <linearGradient
                     id="LinkedinGradient"
@@ -219,9 +218,9 @@ export const ContactSvg = (props: { ref: RefObject<SVGSVGElement | null> }) => {
                     x2="0.6"
                     y2="0.6"
                 >
-                    <stop offset="0" stopColor="#c6c6c6"></stop>
-                    <stop offset="0.2" stopColor="#cfedfb"></stop>
-                    <stop offset="1" stopColor="#0077b5"></stop>
+                    <stop offset="0" stopOpacity={0} stopColor="#0077b5" />
+                    <stop offset="0.5" stopOpacity={0.2} stopColor="#0077b5" />
+                    <stop offset="1" stopOpacity={0} stopColor="#0077b5" />
                 </linearGradient>
                 <linearGradient
                     id="DiscordGradient"
@@ -230,9 +229,9 @@ export const ContactSvg = (props: { ref: RefObject<SVGSVGElement | null> }) => {
                     x2="0.58"
                     y2="0.58"
                 >
-                    <stop offset="0" stopColor="#c6c6c6"></stop>
-                    <stop offset="0.4" stopColor="#5865f2"></stop>
-                    <stop offset="1" stopColor="#393c41"></stop>
+                    <stop offset="0" stopOpacity={0} stopColor="#5865f2" />
+                    <stop offset="0.5" stopOpacity={0.2} stopColor="#5865f2" />
+                    <stop offset="1" stopOpacity={0} stopColor="#5865f2" />
                 </linearGradient>
                 <linearGradient
                     id="GithubGradient"
@@ -241,9 +240,9 @@ export const ContactSvg = (props: { ref: RefObject<SVGSVGElement | null> }) => {
                     x2="0.58"
                     y2="0.58"
                 >
-                    <stop offset="0" stopColor="#c6c6c6"></stop>
-                    <stop offset="0.4" stopColor="#8250df"></stop>
-                    <stop offset="1" stopColor="#000aff"></stop>
+                    <stop offset="0" stopOpacity={0} stopColor="#fff" />
+                    <stop offset="0.5" stopOpacity={0.5} stopColor="#fff" />
+                    <stop offset="1" stopOpacity={0} stopColor="#fff" />
                 </linearGradient>
 
                 <path
