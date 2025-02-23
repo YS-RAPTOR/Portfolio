@@ -90,7 +90,7 @@ const getColor = (gradient: GradientDefinition, offset: number) => {
 
 const startingAnimation = (tl: gsap.core.Timeline) => {
     const negArray: SVGPathElement[] = gsap.utils.toArray(
-        "#G-1>.trace, #G-2>.trace, #L-1>.trace,#L-2>.trace, #D-1>.trace, #D-2>.trace, #M-1>.trace, #M-2>.trace",
+        "#G-1>.trace, #G-2>.trace, #L>.trace, #D-1>.trace, #D-2>.trace, #M-1>.trace, #M-2>.trace",
     );
     const posArray: SVGPathElement[] = gsap.utils.toArray("#ET>.trace");
 
@@ -204,18 +204,10 @@ const repeatingAnimation = (tl: gsap.core.Timeline) => {
     );
     pulseAnimation(
         tl,
-        "#L-1>.pulse",
+        "#L>.pulse",
         ContactConstants.gradients.linkedin,
-        false,
+        "random",
         1,
-        0.2,
-    );
-    pulseAnimation(
-        tl,
-        "#L-2>.pulse",
-        ContactConstants.gradients.linkedin,
-        true,
-        1.5,
         0.2,
     );
     pulseAnimation(

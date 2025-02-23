@@ -365,33 +365,7 @@ export const ContactSvg = (props: { ref: RefObject<SVGSVGElement | null> }) => {
                         d="M1490,560h-20.15l-40,40v99.98c-7.81,7.81-12.19,12.19-20,20h-89.85c-7.81-7.81-12.19-12.19-20-20v-49.98"
                     />
                 </g>
-                <g id="L-1">
-                    <polyline
-                        className="pulse"
-                        points="1030 790 1030 760 1030 750 980 700 980 650"
-                    />
-                    <polyline
-                        className="pulse"
-                        points="990 790 990 750 940 700 940 650"
-                    />
-                    <path
-                        className="pulse"
-                        d="M830,790v-55c5.86-5.86,9.14-9.14,15-15h0c5.86-5.86,9.14-9.14,15-15v-55"
-                    />
-                    <polyline
-                        className="trace"
-                        points="1030 790 1030 760 1030 750 980 700 980 650"
-                    />
-                    <polyline
-                        className="trace"
-                        points="990 790 990 750 940 700 940 650"
-                    />
-                    <path
-                        className="trace"
-                        d="M830,790v-55c5.86-5.86,9.14-9.14,15-15h0c5.86-5.86,9.14-9.14,15-15v-55"
-                    />
-                </g>
-                <g id="L-2">
+                <g id="L">
                     <path
                         className="pulse"
                         d="M1150,790v-65c-1.95-1.95-3.05-3.05-5-5h0c-1.95-1.95-3.05-3.05-5-5v-65"
@@ -399,6 +373,18 @@ export const ContactSvg = (props: { ref: RefObject<SVGSVGElement | null> }) => {
                     <path
                         className="pulse"
                         d="M1110,790v-65c-1.95-1.95-3.05-3.05-5-5h0c-1.95-1.95-3.05-3.05-5-5v-65"
+                    />
+                    <polyline
+                        className="pulse"
+                        points="1030 790 1030 760 1030 750 980 700 980 650"
+                    />
+                    <polyline
+                        className="pulse"
+                        points="990 790 990 750 940 700 940 650"
+                    />
+                    <path
+                        className="pulse"
+                        d="M830,790v-55c5.86-5.86,9.14-9.14,15-15h0c5.86-5.86,9.14-9.14,15-15v-55"
                     />
                     <path
                         className="pulse"
@@ -412,6 +398,18 @@ export const ContactSvg = (props: { ref: RefObject<SVGSVGElement | null> }) => {
                     <path
                         className="trace"
                         d="M1110,790v-65c-1.95-1.95-3.05-3.05-5-5h0c-1.95-1.95-3.05-3.05-5-5v-65"
+                    />
+                    <polyline
+                        className="trace"
+                        points="1030 790 1030 760 1030 750 980 700 980 650"
+                    />
+                    <polyline
+                        className="trace"
+                        points="990 790 990 750 940 700 940 650"
+                    />
+                    <path
+                        className="trace"
+                        d="M830,790v-55c5.86-5.86,9.14-9.14,15-15h0c5.86-5.86,9.14-9.14,15-15v-55"
                     />
                     <path
                         className="trace"
