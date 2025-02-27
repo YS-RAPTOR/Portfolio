@@ -17,11 +17,11 @@ const projects = (await getCollection("projects", ({ data }) => data.done))
     .sort((a, b) => a.title.localeCompare(b.title));
 
 // NOTE: Copy paste the output of this code into the children of the Projects component
-projects.forEach((p, i) => {
-    console.log(
-        `<Image src={projects[${i}].image} alt={projects[${i}].title} slot="Image: ${p.title}" />`,
-    );
-});
+// projects.forEach((p, i) => {
+//     console.log(
+//         `<Image src={projects[${i}].image} alt={projects[${i}].title} slot="Image: ${p.title}" />`,
+//     );
+// });
 
 // Svgs
 const svgMetadata = import.meta.glob<{ default: ImageMetadata }>(
