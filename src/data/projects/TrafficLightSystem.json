@@ -1,10 +1,9 @@
 {
     "title": "Traffic Light System",
-    "description": "TODO",
+    "description": "Developed the logic for a traffic light system in VHDL for implementation on a CPLD.",
     "image": "./Images/TODO.jpg",
     "fields": ["mechatronics", "software", "electrical"],
     "tech": ["vhdl", "cpld"],
     "done": true,
-    "github": "https://github.com/YS-RAPTOR/TrafficLightProject",
-    "link": "TODO"
+    "github": "https://github.com/YS-RAPTOR/TrafficLightProject"
 }

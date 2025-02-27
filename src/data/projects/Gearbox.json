@@ -1,9 +1,8 @@
 {
     "title": "Gearbox",
-    "description": "TODO",
-    "image": "./Images/TODO.jpg",
+    "description": "Led a team of four to design the cohort’s smallest acrylic gearbox, capable of pulling a 1kg weight up a 1m, 45-degree incline.",
+    "image": "./Images/Gearbox.jpg",
     "fields": ["mechatronics", "mechanical"],
     "tech": ["solidworks", "laser cutter"],
-    "done": true,
-    "link": "TODO"
+    "done": true
 }

@@ -160,12 +160,12 @@ const ProjectView = (props: {
     return (
         <div
             className={
-                "project relative flex h-full w-full flex-col justify-between bg-zinc-950 text-sm outline outline-1 outline-zinc-50 lg:text-base " +
+                "project relative flex h-full w-full flex-col justify-between bg-zinc-950 text-xs outline outline-1 outline-zinc-50 lg:text-sm " +
                 (props.isActive ? "" : "hidden")
             }
         >
             <div>
-                <div className="flex aspect-[1.5] w-full items-center justify-center overflow-clip border-b p-0.5">
+                <div className="flex aspect-[1.5] w-full items-center justify-center overflow-clip border-b">
                     {props.children}
                 </div>
                 <div className="flex w-full justify-between border-b">
@@ -176,6 +176,7 @@ const ProjectView = (props: {
                         {props.project.github && (
                             <a
                                 href={props.project.github}
+                                target="_blank"
                                 className="group relative flex h-full cursor-pointer items-center overflow-clip border-l bg-zinc-950 p-2"
                             >
                                 <div className="absolute inset-1 scale-0 rounded-full bg-zinc-50 transition-transform duration-200 ease-in-out group-hover:scale-150" />
@@ -185,6 +186,7 @@ const ProjectView = (props: {
                         {props.project.link && (
                             <a
                                 href={props.project.link}
+                                target="_blank"
                                 className="group relative flex h-full cursor-pointer items-center overflow-clip border-l bg-zinc-950 p-2"
                             >
                                 <div className="absolute inset-1 scale-0 rounded-full bg-zinc-50 transition-transform duration-200 ease-in-out group-hover:scale-150" />

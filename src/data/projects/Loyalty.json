@@ -1,10 +1,9 @@
 {
     "title": "Caffe Loyalty Program",
-    "description": "TODO",
+    "description": "Was contracted to create a QR code-based loyalty mobile app for a café in Darwin.",
     "image": "./Images/TODO.jpg",
     "fields": ["fullstack", "software"],
     "tech": ["typescript", "expo", "react native"],
     "done": true,
-    "link": "TODO",
     "github": "https://github.com/YS-RAPTOR/Loyalty"
 }

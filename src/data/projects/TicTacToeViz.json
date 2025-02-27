@@ -1,7 +1,7 @@
 {
     "title": "Tic Tac Toe Visualizer Robot",
-    "description": "TODO",
-    "image": "./Images/TODO.jpg",
+    "description": "Led a team of three to create a live visualization of a Tic Tac Toe game played on a CLI, using an ABB IRB120 robot as an interactive display.",
+    "image": "./Images/Tic.png",
     "fields": ["mechatronics", "software", "robotics"],
     "tech": ["c++", "opencv", "abb", "rapid"],
     "done": true,

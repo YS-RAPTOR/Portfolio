@@ -1,7 +1,7 @@
 {
     "title": "Pick & Place Robot",
-    "description": "TODO",
-    "image": "./Images/TODO.jpg",
+    "description": "Led a team of 3 that created a robot that can automatically pickup and place items from one location to another using magnets.",
+    "image": "./Images/Pick.jpg",
     "fields": [
         "mechatronics",
         "software",

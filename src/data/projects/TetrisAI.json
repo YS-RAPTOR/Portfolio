@@ -1,7 +1,7 @@
 {
     "title": "Tetris Solver",
-    "description": "TODO",
-    "image": "./Images/TODO.jpg",
+    "description": "Developed an AI that can play tetris by looking at the users screen and sending key strokes.",
+    "image": "./Images/Tetris.jpg",
     "fields": ["software"],
     "tech": ["matlab", "java", "tesseract ocr"],
     "done": true,

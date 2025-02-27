@@ -2,6 +2,11 @@ import { defineCollection, z } from "astro:content";
 import { glob } from "astro/loaders";
 import { jobTypes, technologies } from "./utils/lib";
 
+// TODO:
+// Gearbox Link
+// Loyalty Link
+// Traffic Link
+
 const projects = defineCollection({
     loader: glob({ pattern: "**/*.json", base: "./src/data/projects" }),
     schema: ({ image }) =>
