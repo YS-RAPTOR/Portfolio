@@ -58,9 +58,7 @@ const techSVGs = await getTechSvgs("src/assets", svgMetadata);
             class="relative flex h-fit w-full items-center justify-center border-x md:w-2/3"
         >
             <HeroBackground client:load />
-            <div class="absolute flex flex-col border-2 bg-zinc-950">
-                <HeroHeader client:load />
-            </div>
+            <HeroHeader client:load />
         </div>
     </main>
     <section id="Projects" class="flex h-fit flex-col items-center border-b">

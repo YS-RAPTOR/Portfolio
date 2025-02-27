@@ -1,6 +1,6 @@
 import type { RefObject } from "react";
 
-//TODO: Test discord Link
+//TEST: Discord Link
 export const ContactSvg = (props: { ref: RefObject<SVGSVGElement | null> }) => {
     return (
         <svg

@@ -8,8 +8,6 @@ import { useStore, type SelectionState, noOfSelected } from "../utils/store.ts";
 const duration = 0.4;
 const stagger = 0.2;
 
-// TODO: Make the all animation the same as the others
-// TODO: Make the animations run when in viewport
 export const ProjectsHeader = () => {
     const ref = useRef<HTMLDivElement>(null);
 

@@ -51,7 +51,6 @@ const getNoOfSelected = (projects: State["projects"]) => {
     return count;
 };
 
-//TODO: Add scroll trigger Maybe
 export const Projects = (props: {
     projects: ProjectType[];
     [key: string]: any;

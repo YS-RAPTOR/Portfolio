@@ -389,7 +389,7 @@ class GOL {
                     stagger: {
                         grid: [this.numberVertically, this.numberHorizontally],
                         amount: 1.5,
-                        from: "center",
+                        from: "edges",
                     },
                     onComplete: () => {
                         this.refreshGsap();
