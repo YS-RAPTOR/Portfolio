@@ -4,6 +4,16 @@ import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { element } from "three/src/nodes/TSL.js";
 
+function isWebKit() {
+    const ua = navigator.userAgent;
+    // As far as I can tell, Chromium-based desktop browsers are the only browsers
+    // that pretend to be WebKit-based but aren't.
+    return (
+        (/AppleWebKit/.test(ua) && !/Chrome/.test(ua)) ||
+        /\b(iPad|iPhone|iPod)\b/.test(ua)
+    );
+}
+
 type GradientDefinition = (string | { color: string; stop: number })[];
 
 const ContactConstants = {
@@ -322,25 +332,29 @@ export const Contact = () => {
             });
             repeatingAnimation(rtl);
 
-            const tl = gsap.timeline({
-                paused: true,
-                onComplete: () => {
-                    rtl.play();
-                },
-            });
-            startingAnimation(tl);
+            if (!isWebKit()) {
+                const tl = gsap.timeline({
+                    paused: true,
+                    onComplete: () => {
+                        rtl.play();
+                    },
+                });
+                startingAnimation(tl);
 
-            new IntersectionObserver(
-                (entries, observer) => {
-                    for (let i = 0; i < entries.length; i++) {
-                        if (entries[i].isIntersecting) {
-                            tl.play();
-                            observer.unobserve(entries[i].target);
+                new IntersectionObserver(
+                    (entries, observer) => {
+                        for (let i = 0; i < entries.length; i++) {
+                            if (entries[i].isIntersecting) {
+                                tl.play();
+                                observer.unobserve(entries[i].target);
+                            }
                         }
-                    }
-                },
-                { threshold: 0.8 },
-            ).observe(ref.current);
+                    },
+                    { threshold: 0.8 },
+                ).observe(ref.current);
+            } else {
+                rtl.play();
+            }
 
             const mail = createHoverAnimation(
                 ref.current.querySelector("#Mail") as SVGGElement,
