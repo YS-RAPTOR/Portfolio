@@ -1250,11 +1250,7 @@ export const ContactSvg = (props: { ref: RefObject<SVGSVGElement | null> }) => {
                         />
                     </g>
                 </a>
-                <a
-                    className="cursor-pointer"
-                    target="_blank"
-                    href="discord://user?id=365336776283389952"
-                >
+                <a className="cursor-pointer">
                     <g id="Discord">
                         <g id="Bottom_Leads-2">
                             <path

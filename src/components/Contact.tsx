@@ -320,10 +320,11 @@ const createHoverAnimation = (group: SVGGElement) => {
 
 export const Contact = () => {
     const ref = useRef<SVGSVGElement>(null);
+    const toastRef = useRef<HTMLDivElement>(null);
 
-    useGSAP(
+    const { contextSafe } = useGSAP(
         () => {
-            if (!ref.current) return;
+            if (!ref.current || !toastRef.current) return;
 
             const rtl = gsap.timeline({
                 repeat: -1,
@@ -380,6 +381,47 @@ export const Contact = () => {
             discord.element.addEventListener("pointerenter", discord.onEnter);
             discord.element.addEventListener("pointerleave", discord.onLeave);
 
+            // Toast Timeline
+            const toastTl = gsap.timeline({
+                paused: true,
+            });
+            toastTl.fromTo(
+                toastRef.current,
+                {
+                    display: "block",
+                    opacity: 0,
+                    yPercent: 100,
+                    scale: 0.8,
+                },
+                {
+                    ease: "elastic.out(1, 1)",
+                    opacity: 1,
+                    yPercent: 0,
+                    scale: 1,
+                    duration: 1,
+                },
+            );
+            toastTl.to(
+                toastRef.current,
+                {
+                    scale: 0,
+                    opacity: 0,
+                    ease: "expo.out",
+                    display: "none",
+                },
+                0.75,
+            );
+
+            const toastClick = () => {
+                toastTl.restart();
+                window.navigator.clipboard.writeText("ys_raptor");
+            };
+
+            discord.element.parentElement!.addEventListener(
+                "click",
+                toastClick,
+            );
+
             return () => {
                 mail.element.removeEventListener("pointerenter", mail.onEnter);
                 mail.element.removeEventListener("pointerleave", mail.onLeave);
@@ -410,10 +452,27 @@ export const Contact = () => {
                     "pointerleave",
                     discord.onLeave,
                 );
+
+                // Toast Click
+                discord.element.parentElement!.removeEventListener(
+                    "click",
+                    toastClick,
+                );
             };
         },
         { scope: ref },
     );
 
-    return <ContactSvg ref={ref} />;
+    return (
+        <>
+            <ContactSvg ref={ref} />
+            <div
+                ref={toastRef}
+                className="fixed bottom-5 right-5 hidden border bg-zinc-950 p-2 text-xs"
+            >
+                <h1 className="font-bold">Discord Username Copied!</h1>
+                <p>ys_raptor</p>
+            </div>
+        </>
+    );
 };
