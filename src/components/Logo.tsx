@@ -113,6 +113,8 @@ export const Logo = () => {
                 data-name="Layer 2"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 435.57 727.32"
+                width="60px"
+                height="60px"
             >
                 <g id="Base_Logo_Light" data-name="Base Logo Light">
                     <g>
