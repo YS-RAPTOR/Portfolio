@@ -38,7 +38,7 @@ const techSVGs = await getTechSvgs("src/assets", svgMetadata);
             <Logo client:load />
             <div class="flex min-w-fit">
                 <a
-                    href="/Portfolio/resume"
+                    href="/Portfolio/resume.pdf"
                     class="flex h-full min-w-fit items-center justify-center border-x px-3 text-center text-base font-black duration-200 hover:bg-zinc-700 xs:px-5 xs:text-lg"
                 >
                     Resume
@@ -79,32 +79,42 @@ const techSVGs = await getTechSvgs("src/assets", svgMetadata);
             <Image
                 src={projects[2].image}
                 alt={projects[2].title}
-                slot="Image: Gearbox"
+                slot="Image: Daedalus"
             />
             <Image
                 src={projects[3].image}
                 alt={projects[3].title}
-                slot="Image: Pick & Place Robot"
+                slot="Image: Gearbox"
             />
             <Image
                 src={projects[4].image}
                 alt={projects[4].title}
-                slot="Image: Tetris Solver"
+                slot="Image: Pick & Place Robot"
             />
             <Image
                 src={projects[5].image}
                 alt={projects[5].title}
-                slot="Image: Theme Journal App"
+                slot="Image: Tetris Solver"
             />
             <Image
                 src={projects[6].image}
                 alt={projects[6].title}
-                slot="Image: Tic Tac Toe Visualizer Robot"
+                slot="Image: Theme Journal App"
             />
             <Image
                 src={projects[7].image}
                 alt={projects[7].title}
+                slot="Image: Tic Tac Toe Visualizer Robot"
+            />
+            <Image
+                src={projects[8].image}
+                alt={projects[8].title}
                 slot="Image: Traffic Light System"
+            />
+            <Image
+                src={projects[9].image}
+                alt={projects[9].title}
+                slot="Image: UAV Live Video Streaming"
             />
         </Projects>
     </section>

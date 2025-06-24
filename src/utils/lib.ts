@@ -55,14 +55,17 @@ export const technologies = [
     "c++",
     "abb",
     "c#",
+    "ffmpeg",
     "expo",
     "react native",
     "react three fiber",
     "react",
     "rapid",
     "zig",
+    "sdl",
     "tailwind",
     "typescript",
+    "slang",
     "solidworks",
     "3d printing",
     "tesseract ocr",
@@ -115,6 +118,9 @@ export const getTechName = (tech: Technology) => {
     else if (tech === "fastapi") return "FastAPI";
     else if (tech === "expo") return "Expo";
     else if (tech === "react native") return "React Native";
+    else if (tech === "ffmpeg") return "FFmpeg";
+    else if (tech === "sdl") return "SDL";
+    else if (tech === "slang") return "Slang";
     assetUnreachable(tech);
 };
 

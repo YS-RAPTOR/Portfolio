@@ -1,0 +1,9 @@
+{
+    "title": "UAV Live Video Streaming",
+    "description": "Developed a live video streaming protocol for UAVs using Zig and FFmpeg. The protocol works very well for systems that perform AI-based video stream analysis.",
+    "image": "./Images/UAV.png",
+    "done": true,
+    "tech": ["zig", "ffmpeg"],
+    "fields": ["software", "robotics", "mechatronics"],
+    "github": "https://github.com/YS-RAPTOR/UAV_Streaming"
+}

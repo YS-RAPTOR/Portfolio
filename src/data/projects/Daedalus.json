@@ -1,0 +1,9 @@
+{
+    "title": "Daedalus",
+    "description": "Daedalus is a simple game developed with the SDL library featuring a procedural maze generator and a maze-solving agent. It implements game AI techniques such as steering-force-based movement, A* search, and Goal Oriented Action Planning.",
+    "image": "./Images/Daedalus.png",
+    "done": true,
+    "tech": ["zig", "sdl", "slang"],
+    "fields": ["software"],
+    "github": "https://github.com/YS-RAPTOR/Daedalus"
+}
