@@ -5,5 +5,5 @@
     "done": true,
     "tech": ["zig", "ffmpeg"],
     "fields": ["software", "robotics", "mechatronics"],
-    "github": "https://github.com/YS-RAPTOR/UAV_Streaming"
+    "github": "https://github.com/YS-RAPTOR/UAV-Streaming"
 }
